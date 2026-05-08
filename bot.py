@@ -1,9 +1,9 @@
 """
-Bees House 🐝 — Telegram Bot
-Зберігання даних у Telegram групі
+Bees House 🐝 — Telegram Bot + HTTP API
 """
 import os, json, logging, asyncio
 from datetime import date, datetime
+from aiohttp import web
 from aiogram import Bot, Dispatcher, F
 from aiogram.types import (
     Message, CallbackQuery,
@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 BOT_TOKEN  = os.getenv("BOT_TOKEN", "")
 WEBAPP_URL = os.getenv("WEBAPP_URL", "https://lykosexe.github.io/bees-house")
 DB_CHANNEL = int(os.getenv("DB_CHANNEL", "0"))
+PORT       = int(os.getenv("PORT", "8080"))
 DB_PATH    = os.path.join(os.path.dirname(__file__), "../data/db.json")
 
 bot = Bot(token=BOT_TOKEN)
@@ -89,10 +90,8 @@ async def save_db(db):
         )
         await bot.pin_chat_message(DB_CHANNEL, msg.message_id, disable_notification=True)
         if _db_message_id and _db_message_id != msg.message_id:
-            try:
-                await bot.delete_message(DB_CHANNEL, _db_message_id)
-            except:
-                pass
+            try: await bot.delete_message(DB_CHANNEL, _db_message_id)
+            except: pass
         _db_message_id = msg.message_id
         logger.info("✅ DB saved to Telegram")
     except Exception as e:
@@ -100,6 +99,40 @@ async def save_db(db):
 
 def get_db():
     return _db_cache or load_db_local()
+
+# ── HTTP API ──────────────────────────────────────────────────────────────
+async def handle_get_db(request):
+    """GET /db — віддає поточну БД для Mini App"""
+    db = get_db()
+    return web.Response(
+        text=json.dumps(db, ensure_ascii=False),
+        content_type="application/json",
+        headers={"Access-Control-Allow-Origin": "*"}
+    )
+
+async def handle_save_db(request):
+    """POST /db — зберігає БД від Mini App"""
+    try:
+        data = await request.json()
+        if not data.get("workers") is None and not data.get("records") is None:
+            await save_db(data)
+            return web.Response(text='{"ok":true}', content_type="application/json",
+                                headers={"Access-Control-Allow-Origin": "*"})
+    except Exception as e:
+        logger.error(f"Save via API error: {e}")
+    return web.Response(status=400, text='{"ok":false}', content_type="application/json",
+                        headers={"Access-Control-Allow-Origin": "*"})
+
+async def handle_options(request):
+    """OPTIONS — для CORS preflight"""
+    return web.Response(headers={
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+    })
+
+async def handle_health(request):
+    return web.Response(text="🐝 Bees House Bot is running!")
 
 # ── Helpers ───────────────────────────────────────────────────────────────
 def gen_id():
@@ -116,16 +149,15 @@ def fmt(n):
     return f"{int(n):,}".replace(",","\u00a0") if n==int(n) else f"{n:,.2f}".replace(",","\u00a0")
 
 def rec_earned(r):
-    return (r.get("dadan",0)*r.get("pDadan",0) +
-            r.get("ruta",0)*r.get("pRuta",0) +
+    return (r.get("dadan",0)*r.get("pDadan",0)+r.get("ruta",0)*r.get("pRuta",0)+
             r.get("magazynna",0)*(r.get("pMag") or r.get("pMagazynna",0)))
 
 def w_stats(w, records):
-    recs   = [r for r in records if r["workerId"]==w["id"]]
-    earned = sum(rec_earned(r) for r in recs if r["type"]=="frames")
-    paid   = sum(r.get("amount",0) for r in recs if r["type"]=="payment")
-    frames = sum(r.get("dadan",0)+r.get("ruta",0)+r.get("magazynna",0) for r in recs if r["type"]=="frames")
-    return {**w, "earned":earned, "paid":paid, "debt":earned-paid, "frames":frames}
+    recs=[ r for r in records if r["workerId"]==w["id"]]
+    earned=sum(rec_earned(r) for r in recs if r["type"]=="frames")
+    paid=sum(r.get("amount",0) for r in recs if r["type"]=="payment")
+    frames=sum(r.get("dadan",0)+r.get("ruta",0)+r.get("magazynna",0) for r in recs if r["type"]=="frames")
+    return {**w,"earned":earned,"paid":paid,"debt":earned-paid,"frames":frames}
 
 def worker_by_id(db, wid):
     return next((w for w in db["workers"] if w["id"]==wid), None)
@@ -151,17 +183,17 @@ def webapp_kb():
     ]])
 
 def workers_kb(workers, prefix):
-    rows = [[InlineKeyboardButton(text=w["name"], callback_data=f"{prefix}:{w['id']}")] for w in workers]
-    rows.append([InlineKeyboardButton(text="❌ Скасувати", callback_data="cancel")])
+    rows=[[InlineKeyboardButton(text=w["name"],callback_data=f"{prefix}:{w['id']}")] for w in workers]
+    rows.append([InlineKeyboardButton(text="❌ Скасувати",callback_data="cancel")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 def confirm_kb(yes_data):
     return InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(text="✅ Так", callback_data=yes_data),
-        InlineKeyboardButton(text="❌ Ні",  callback_data="cancel"),
+        InlineKeyboardButton(text="✅ Так",callback_data=yes_data),
+        InlineKeyboardButton(text="❌ Ні", callback_data="cancel"),
     ]])
 
-# ── Handlers ─────────────────────────────────────────────────────────────
+# ── Handlers ──────────────────────────────────────────────────────────────
 @dp.message(CommandStart())
 async def cmd_start(msg: Message):
     await msg.answer("🐝 <b>Bees House</b> — облік виробництва", parse_mode="HTML", reply_markup=main_kb())
@@ -186,7 +218,6 @@ async def workers_list(msg: Message):
         await msg.answer("Виконавців немає. Додайте через додаток 📱", reply_markup=webapp_kb()); return
     lines=["<b>👷 Виконавці:</b>"]
     for s in stats:
-        p=s.get("prices",{})
         d=f"🔴 Борг {fmt(s['debt'])} ₴" if s['debt']>0 else (f"🟢 Переплата {fmt(abs(s['debt']))} ₴" if s['debt']<0 else "🟡 Розраховано")
         lines.append(f"\n<b>{s['name']}</b> — {s['frames']} рам. | {fmt(s['earned'])} ₴\n  {d}")
     await msg.answer("\n".join(lines), parse_mode="HTML")
@@ -202,7 +233,7 @@ async def frames_start(msg: Message, state: FSMContext):
 @dp.callback_query(AddFrames.worker, F.data.startswith("frames:"))
 async def frames_worker(cb: CallbackQuery, state: FSMContext):
     wid=cb.data.split(":")[1]; db=get_db(); w=worker_by_id(db,wid)
-    await state.update_data(wid=wid, prices=w["prices"])
+    await state.update_data(wid=wid,prices=w["prices"])
     await state.set_state(AddFrames.dadan)
     await cb.message.edit_text(f"👷 <b>{w['name']}</b>\n\n🟠 Скільки <b>Дадан</b>? (0 якщо немає)", parse_mode="HTML")
 
@@ -234,8 +265,9 @@ async def frames_mag(msg: Message, state: FSMContext):
     if m_n: parts.append(f"Маг. {m_n} × {p.get('magazynna')} = {fmt(m_n*p.get('magazynna',0))} ₴")
     if not parts:
         await msg.answer("Всі 0 — нічого не збережено."); await state.clear(); return
-    await state.update_data(magazynna=n, total=total)
-    await msg.answer(f"👷 <b>{w['name']}</b>\n📅 {fmt_date(today_str())}\n\n"+"\n".join(parts)+f"\n\n💰 <b>{fmt(total)} ₴</b>\n\nЗберегти?",
+    await state.update_data(magazynna=n,total=total)
+    await msg.answer(f"👷 <b>{w['name']}</b>\n📅 {fmt_date(today_str())}\n\n"+"\n".join(parts)+
+                     f"\n\n💰 <b>{fmt(total)} ₴</b>\n\nЗберегти?",
                      parse_mode="HTML", reply_markup=confirm_kb("frames_save"))
 
 @dp.callback_query(F.data == "frames_save")
@@ -251,8 +283,7 @@ async def frames_save(cb: CallbackQuery, state: FSMContext):
 @dp.message(F.text == "💰 Виплата")
 async def payment_start(msg: Message, state: FSMContext):
     db=get_db()
-    if not db["workers"]:
-        await msg.answer("Виконавців немає."); return
+    if not db["workers"]: await msg.answer("Виконавців немає."); return
     await state.set_state(AddPayment.worker)
     await msg.answer("👷 Кому виплата?", reply_markup=workers_kb(db["workers"],"pay"))
 
@@ -260,8 +291,8 @@ async def payment_start(msg: Message, state: FSMContext):
 async def payment_worker(cb: CallbackQuery, state: FSMContext):
     wid=cb.data.split(":")[1]; db=get_db(); w=worker_by_id(db,wid); s=w_stats(w,db["records"])
     await state.update_data(wid=wid); await state.set_state(AddPayment.amount)
-    debt_line=f"\n🔴 Борг: <b>{fmt(s['debt'])} ₴</b>" if s['debt']>0 else (f"\n🟢 Переплата: <b>{fmt(abs(s['debt']))} ₴</b>" if s['debt']<0 else "")
-    await cb.message.edit_text(f"👷 <b>{w['name']}</b>{debt_line}\n\nВведи суму (₴):", parse_mode="HTML")
+    dl=f"\n🔴 Борг: <b>{fmt(s['debt'])} ₴</b>" if s['debt']>0 else (f"\n🟢 Переплата: <b>{fmt(abs(s['debt']))} ₴</b>" if s['debt']<0 else "")
+    await cb.message.edit_text(f"👷 <b>{w['name']}</b>{dl}\n\nВведи суму (₴):", parse_mode="HTML")
 
 @dp.message(AddPayment.amount)
 async def payment_amount(msg: Message, state: FSMContext):
@@ -300,11 +331,26 @@ async def settings(msg: Message):
 async def cancel(cb: CallbackQuery, state: FSMContext):
     await state.clear(); await cb.message.edit_text("❌ Скасовано.")
 
+# ── Main ──────────────────────────────────────────────────────────────────
 async def main():
     logger.info("🐝 Starting Bees House Bot")
     await load_db()
     db=get_db()
     logger.info(f"DB: {len(db.get('workers',[]))} workers, {len(db.get('records',[]))} records")
+
+    # HTTP сервер для Mini App
+    app = web.Application()
+    app.router.add_get("/", handle_health)
+    app.router.add_get("/db", handle_get_db)
+    app.router.add_post("/db", handle_save_db)
+    app.router.add_route("OPTIONS", "/db", handle_options)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", PORT)
+    await site.start()
+    logger.info(f"✅ HTTP API started on port {PORT}")
+
+    # Telegram бот
     await dp.start_polling(bot)
 
 if __name__ == "__main__":

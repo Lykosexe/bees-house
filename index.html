@@ -328,15 +328,44 @@ const IC = {
   chev:`<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>`,
 };
 
+// ── API Config ────────────────────────────────────────────────────────────
+const API_URL = 'https://bees-house-bot-production.up.railway.app';
+
 // ── Storage ───────────────────────────────────────────────────────────────
 function loadDB() {
+  // Fallback to localStorage if API not available
   try { const s=localStorage.getItem(LKEY); if(s) return JSON.parse(s); } catch(e){}
   return null;
 }
 function saveDB() {
+  // Save to localStorage as backup
   try { localStorage.setItem(LKEY, JSON.stringify(DB)); } catch(e){}
-  // Notify Telegram that data changed
-  if (tg) tg.sendData && console.log('DB saved');
+  // Save to API (async, don't block UI)
+  fetch(API_URL+'/db', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(DB)
+  }).then(r=>r.json()).then(d=>{
+    const el=document.getElementById('st-s');
+    if(el) el.textContent = d.ok ? '☁️ Синхронізовано' : '💾 Локально';
+  }).catch(()=>{
+    const el=document.getElementById('st-s');
+    if(el) el.textContent = '💾 Локально';
+  });
+}
+async function loadFromAPI() {
+  try {
+    const r = await fetch(API_URL+'/db');
+    if(r.ok) {
+      const data = await r.json();
+      if(data.workers && data.records) {
+        DB = data;
+        try { localStorage.setItem(LKEY, JSON.stringify(DB)); } catch(e){}
+        return true;
+      }
+    }
+  } catch(e) { console.log('API load failed, using localStorage'); }
+  return false;
 }
 function exportData() {
   try {
@@ -667,12 +696,14 @@ function delRecInDetail(recId,wid){if(!confirm('Видалити цей запи
 function delWorker(id){const w=DB.workers.find(x=>x.id===id);if(!w||!confirm(`Видалити ${w.name}? Записи залишаться.`))return;DB.workers=DB.workers.filter(x=>x.id!==id);saveDB();closeModal('m-wdetail');renderHome();renderWorkers();}
 
 // ── Init ──────────────────────────────────────────────────────────────────
-(function init(){
+(async function init(){
   DB = loadDB() || {"defaultPrices":{"dadan":4.5,"ruta":3.5,"magazynna":3.0},"workers":[],"records":[]};
-  saveDB();
   document.getElementById('lov').style.display='none';
   document.getElementById('app').style.display='flex';
   renderHome();
+  // Підтягуємо актуальні дані з сервера
+  const loaded = await loadFromAPI();
+  if(loaded){ renderHome(); renderSettings(); }
 })();
 </script>
 </body>
