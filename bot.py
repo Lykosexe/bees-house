@@ -1,6 +1,6 @@
 """
 Bees House 🐝 — Telegram Bot
-Облік рамок, тирси, складу
+Зберігання даних у Telegram групі
 """
 import os, json, logging, asyncio
 from datetime import date, datetime
@@ -8,7 +8,8 @@ from aiogram import Bot, Dispatcher, F
 from aiogram.types import (
     Message, CallbackQuery,
     InlineKeyboardMarkup, InlineKeyboardButton,
-    WebAppInfo, KeyboardButton, ReplyKeyboardMarkup
+    WebAppInfo, KeyboardButton, ReplyKeyboardMarkup,
+    BufferedInputFile
 )
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
@@ -18,383 +19,292 @@ from aiogram.fsm.storage.memory import MemoryStorage
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-BOT_TOKEN = os.getenv("BOT_TOKEN", "")
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://your-username.github.io/bees-house")
-DB_PATH = os.path.join(os.path.dirname(__file__), "../data/db.json")
+BOT_TOKEN  = os.getenv("BOT_TOKEN", "")
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://lykosexe.github.io/bees-house")
+DB_CHANNEL = int(os.getenv("DB_CHANNEL", "0"))
+DB_PATH    = os.path.join(os.path.dirname(__file__), "../data/db.json")
 
-# ── Database ──────────────────────────────────────────────────────────────
-def load_db():
-    with open(DB_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
+bot = Bot(token=BOT_TOKEN)
+dp  = Dispatcher(storage=MemoryStorage())
 
-def save_db(db):
-    with open(DB_PATH, "w", encoding="utf-8") as f:
-        json.dump(db, f, ensure_ascii=False, indent=2)
+_db_cache      = None
+_db_message_id = None
 
+def _default_db():
+    return {"defaultPrices": {"dadan": 4.5, "ruta": 3.5, "magazynna": 3.0},
+            "workers": [], "records": []}
+
+def load_db_local():
+    try:
+        with open(DB_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except:
+        return _default_db()
+
+def save_db_local(db):
+    try:
+        os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+        with open(DB_PATH, "w", encoding="utf-8") as f:
+            json.dump(db, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        logger.error(f"Local save error: {e}")
+
+async def load_db():
+    global _db_cache, _db_message_id
+    if not DB_CHANNEL:
+        _db_cache = load_db_local()
+        return _db_cache
+    try:
+        import aiohttp
+        chat = await bot.get_chat(DB_CHANNEL)
+        if chat.pinned_message and chat.pinned_message.document:
+            msg = chat.pinned_message
+            _db_message_id = msg.message_id
+            file = await bot.get_file(msg.document.file_id)
+            url  = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file.file_path}"
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as resp:
+                    content = await resp.text()
+                    _db_cache = json.loads(content)
+                    logger.info(f"✅ DB loaded from Telegram: {len(_db_cache.get('workers',[]))} workers")
+                    return _db_cache
+    except Exception as e:
+        logger.warning(f"Telegram load failed: {e}, using local")
+    _db_cache = load_db_local()
+    return _db_cache
+
+async def save_db(db):
+    global _db_cache, _db_message_id
+    _db_cache = db
+    save_db_local(db)
+    if not DB_CHANNEL:
+        return
+    try:
+        json_bytes = json.dumps(db, ensure_ascii=False, indent=2).encode("utf-8")
+        doc = BufferedInputFile(json_bytes, filename="db.json")
+        msg = await bot.send_document(
+            DB_CHANNEL, doc,
+            caption=f"🐝 {datetime.now().strftime('%d.%m.%Y %H:%M')} | "
+                    f"{len(db.get('workers',[]))} виконавців | {len(db.get('records',[]))} записів"
+        )
+        await bot.pin_chat_message(DB_CHANNEL, msg.message_id, disable_notification=True)
+        if _db_message_id and _db_message_id != msg.message_id:
+            try:
+                await bot.delete_message(DB_CHANNEL, _db_message_id)
+            except:
+                pass
+        _db_message_id = msg.message_id
+        logger.info("✅ DB saved to Telegram")
+    except Exception as e:
+        logger.error(f"Telegram save error: {e}")
+
+def get_db():
+    return _db_cache or load_db_local()
+
+# ── Helpers ───────────────────────────────────────────────────────────────
 def gen_id():
     import random, string, time
-    chars = string.ascii_lowercase + string.digits
-    return ''.join(random.choices(chars, k=8)) + hex(int(time.time() * 1000))[2:]
+    return ''.join(random.choices(string.ascii_lowercase+string.digits, k=8))+hex(int(time.time()*1000))[2:]
 
-def today_str():
-    return date.today().isoformat()
+def today_str():    return date.today().isoformat()
+def fmt_date(iso):
+    try: return datetime.strptime(iso, "%Y-%m-%d").strftime("%d.%m.%Y")
+    except: return iso
 
 def fmt(n):
     n = round(float(n or 0), 2)
-    if n == int(n):
-        return f"{int(n):,}".replace(",", "\u00a0")
-    return f"{n:,.2f}".replace(",", "\u00a0")
-
-def fmt_date(iso):
-    try:
-        return datetime.strptime(iso, "%Y-%m-%d").strftime("%d.%m.%Y")
-    except:
-        return iso
+    return f"{int(n):,}".replace(",","\u00a0") if n==int(n) else f"{n:,.2f}".replace(",","\u00a0")
 
 def rec_earned(r):
-    return (r.get("dadan", 0) * r.get("pDadan", 0) +
-            r.get("ruta", 0) * r.get("pRuta", 0) +
-            r.get("magazynna", 0) * (r.get("pMag") or r.get("pMagazynna", 0)))
+    return (r.get("dadan",0)*r.get("pDadan",0) +
+            r.get("ruta",0)*r.get("pRuta",0) +
+            r.get("magazynna",0)*(r.get("pMag") or r.get("pMagazynna",0)))
 
 def w_stats(w, records):
-    recs = [r for r in records if r["workerId"] == w["id"]]
-    earned = sum(rec_earned(r) for r in recs if r["type"] == "frames")
-    paid   = sum(r.get("amount", 0) for r in recs if r["type"] == "payment")
-    frames = sum(r.get("dadan",0) + r.get("ruta",0) + r.get("magazynna",0)
-                 for r in recs if r["type"] == "frames")
-    return {**w, "earned": earned, "paid": paid, "debt": earned - paid, "frames": frames}
+    recs   = [r for r in records if r["workerId"]==w["id"]]
+    earned = sum(rec_earned(r) for r in recs if r["type"]=="frames")
+    paid   = sum(r.get("amount",0) for r in recs if r["type"]=="payment")
+    frames = sum(r.get("dadan",0)+r.get("ruta",0)+r.get("magazynna",0) for r in recs if r["type"]=="frames")
+    return {**w, "earned":earned, "paid":paid, "debt":earned-paid, "frames":frames}
 
 def worker_by_id(db, wid):
-    return next((w for w in db["workers"] if w["id"] == wid), None)
+    return next((w for w in db["workers"] if w["id"]==wid), None)
 
-# ── FSM States ────────────────────────────────────────────────────────────
+# ── FSM ───────────────────────────────────────────────────────────────────
 class AddFrames(StatesGroup):
-    worker   = State()
-    dadan    = State()
-    ruta     = State()
-    magazynna = State()
+    worker=State(); dadan=State(); ruta=State(); magazynna=State()
 
 class AddPayment(StatesGroup):
-    worker = State()
-    amount = State()
-
-class AddWorker(StatesGroup):
-    name        = State()
-    price_dadan = State()
-    price_ruta  = State()
-    price_mag   = State()
+    worker=State(); amount=State()
 
 # ── Keyboards ─────────────────────────────────────────────────────────────
 def main_kb():
     return ReplyKeyboardMarkup(keyboard=[
-        [KeyboardButton(text="🏠 Головна"),   KeyboardButton(text="👷 Виконавці")],
-        [KeyboardButton(text="🔨 Рамки"),     KeyboardButton(text="💰 Виплата")],
-        [KeyboardButton(text="📊 Звіт"),      KeyboardButton(text="⚙️ Налаштування")],
+        [KeyboardButton(text="🏠 Головна"),  KeyboardButton(text="👷 Виконавці")],
+        [KeyboardButton(text="🔨 Рамки"),    KeyboardButton(text="💰 Виплата")],
+        [KeyboardButton(text="📊 Звіт"),     KeyboardButton(text="⚙️ Налаштування")],
     ], resize_keyboard=True)
 
-def webapp_kb(url: str):
+def webapp_kb():
     return InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(
-            text="📱 Відкрити додаток",
-            web_app=WebAppInfo(url=url)
-        )
+        InlineKeyboardButton(text="📱 Відкрити додаток", web_app=WebAppInfo(url=WEBAPP_URL))
     ]])
 
-def workers_inline_kb(workers, prefix="pay"):
-    rows = [[InlineKeyboardButton(text=w["name"], callback_data=f"{prefix}:{w['id']}")]
-            for w in workers]
+def workers_kb(workers, prefix):
+    rows = [[InlineKeyboardButton(text=w["name"], callback_data=f"{prefix}:{w['id']}")] for w in workers]
     rows.append([InlineKeyboardButton(text="❌ Скасувати", callback_data="cancel")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
-def confirm_kb(yes_data, no_data="cancel"):
+def confirm_kb(yes_data):
     return InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(text="✅ Так", callback_data=yes_data),
-        InlineKeyboardButton(text="❌ Ні",  callback_data=no_data),
+        InlineKeyboardButton(text="❌ Ні",  callback_data="cancel"),
     ]])
 
-# ── Bot setup ─────────────────────────────────────────────────────────────
-bot = Bot(token=BOT_TOKEN)
-dp  = Dispatcher(storage=MemoryStorage())
-
-# ── /start ────────────────────────────────────────────────────────────────
+# ── Handlers ─────────────────────────────────────────────────────────────
 @dp.message(CommandStart())
 async def cmd_start(msg: Message):
-    await msg.answer(
-        "🐝 <b>Bees House</b> — облік виробництва\n\n"
-        "Обери розділ у меню або відкрий повний додаток кнопкою нижче.",
-        parse_mode="HTML",
-        reply_markup=main_kb()
-    )
-    await msg.answer("📱 Повний додаток:", reply_markup=webapp_kb(WEBAPP_URL))
+    await msg.answer("🐝 <b>Bees House</b> — облік виробництва", parse_mode="HTML", reply_markup=main_kb())
+    await msg.answer("📱 Повний додаток:", reply_markup=webapp_kb())
 
-# ── Головна ───────────────────────────────────────────────────────────────
 @dp.message(F.text == "🏠 Головна")
 async def home(msg: Message):
-    db = load_db()
-    stats = [w_stats(w, db["records"]) for w in db["workers"]]
-    total_frames = sum(s["frames"] for s in stats)
-    total_debt   = sum(s["debt"]   for s in stats)
-    total_paid   = sum(s["paid"]   for s in stats)
-
-    debt_sign = "📉 Борг" if total_debt > 0 else ("📈 Переплата" if total_debt < 0 else "✅ Розраховано")
-    lines = [
-        f"🐝 <b>Облік рамок</b> — {datetime.now().strftime('%d.%m.%Y')}",
-        "",
-        f"🔨 Рамок збито: <b>{total_frames}</b>",
-        f"{debt_sign}: <b>{fmt(abs(total_debt))} ₴</b>  (виплачено {fmt(total_paid)} ₴)",
-        "",
-        "<b>Виконавці:</b>",
-    ]
+    db=get_db(); stats=[w_stats(w,db["records"]) for w in db["workers"]]
+    tF=sum(s["frames"] for s in stats); tD=sum(s["debt"] for s in stats); tP=sum(s["paid"] for s in stats)
+    sign="📉 Борг" if tD>0 else ("📈 Переплата" if tD<0 else "✅ Розраховано")
+    lines=[f"🐝 <b>Bees House</b> — {datetime.now().strftime('%d.%m.%Y')}",
+           f"🔨 Рамок: <b>{tF}</b> | {sign}: <b>{fmt(abs(tD))} ₴</b>","","<b>Виконавці:</b>"]
     for s in stats:
-        debt_str = f"борг {fmt(s['debt'])} ₴" if s['debt'] > 0 else \
-                   (f"переплата {fmt(abs(s['debt']))} ₴" if s['debt'] < 0 else "✓ розраховано")
-        lines.append(f"• {s['name']} — {s['frames']} рам. | {debt_str}")
+        d=f"борг {fmt(s['debt'])} ₴" if s['debt']>0 else (f"переплата {fmt(abs(s['debt']))} ₴" if s['debt']<0 else "✓")
+        lines.append(f"• {s['name']} — {s['frames']} рам. | {d}")
+    await msg.answer("\n".join(lines), parse_mode="HTML")
 
-    await msg.answer("\n".join(lines), parse_mode="HTML", reply_markup=main_kb())
-
-# ── Виконавці ─────────────────────────────────────────────────────────────
 @dp.message(F.text == "👷 Виконавці")
 async def workers_list(msg: Message):
-    db = load_db()
-    stats = [w_stats(w, db["records"]) for w in db["workers"]]
+    db=get_db(); stats=[w_stats(w,db["records"]) for w in db["workers"]]
     if not stats:
-        await msg.answer("Виконавців ще немає. Додайте через додаток 📱",
-                         reply_markup=webapp_kb(WEBAPP_URL))
-        return
-    lines = ["<b>👷 Виконавці:</b>", ""]
+        await msg.answer("Виконавців немає. Додайте через додаток 📱", reply_markup=webapp_kb()); return
+    lines=["<b>👷 Виконавці:</b>"]
     for s in stats:
-        p = s.get("prices", {})
-        debt_str = f"🔴 Борг {fmt(s['debt'])} ₴" if s['debt'] > 0 else \
-                   (f"🟢 Переплата {fmt(abs(s['debt']))} ₴" if s['debt'] < 0 else "🟡 Розраховано")
-        lines.append(
-            f"<b>{s['name']}</b>\n"
-            f"  Рамок: {s['frames']} | Нарах: {fmt(s['earned'])} ₴\n"
-            f"  Ціни: Дадан {p.get('dadan','?')} | Рута {p.get('ruta','?')} | Маг. {p.get('magazynna','?')} ₴\n"
-            f"  {debt_str}"
-        )
-    await msg.answer("\n\n".join(lines), parse_mode="HTML")
+        p=s.get("prices",{})
+        d=f"🔴 Борг {fmt(s['debt'])} ₴" if s['debt']>0 else (f"🟢 Переплата {fmt(abs(s['debt']))} ₴" if s['debt']<0 else "🟡 Розраховано")
+        lines.append(f"\n<b>{s['name']}</b> — {s['frames']} рам. | {fmt(s['earned'])} ₴\n  {d}")
+    await msg.answer("\n".join(lines), parse_mode="HTML")
 
-# ── Рамки: вибір виконавця ────────────────────────────────────────────────
 @dp.message(F.text == "🔨 Рамки")
 async def frames_start(msg: Message, state: FSMContext):
-    db = load_db()
+    db=get_db()
     if not db["workers"]:
-        await msg.answer("Спочатку додайте виконавця через додаток 📱",
-                         reply_markup=webapp_kb(WEBAPP_URL))
-        return
+        await msg.answer("Додайте виконавця через додаток 📱", reply_markup=webapp_kb()); return
     await state.set_state(AddFrames.worker)
-    await msg.answer("👷 Вибери виконавця:",
-                     reply_markup=workers_inline_kb(db["workers"], "frames"))
+    await msg.answer("👷 Вибери виконавця:", reply_markup=workers_kb(db["workers"],"frames"))
 
 @dp.callback_query(AddFrames.worker, F.data.startswith("frames:"))
 async def frames_worker(cb: CallbackQuery, state: FSMContext):
-    wid = cb.data.split(":")[1]
-    db  = load_db()
-    w   = worker_by_id(db, wid)
+    wid=cb.data.split(":")[1]; db=get_db(); w=worker_by_id(db,wid)
     await state.update_data(wid=wid, prices=w["prices"])
     await state.set_state(AddFrames.dadan)
-    await cb.message.edit_text(
-        f"👷 <b>{w['name']}</b>\n\n🟠 Скільки <b>Дадан</b>? (0 якщо немає)",
-        parse_mode="HTML"
-    )
+    await cb.message.edit_text(f"👷 <b>{w['name']}</b>\n\n🟠 Скільки <b>Дадан</b>? (0 якщо немає)", parse_mode="HTML")
 
 @dp.message(AddFrames.dadan)
 async def frames_dadan(msg: Message, state: FSMContext):
-    try:
-        n = int(msg.text.strip())
-    except:
-        await msg.answer("Введи ціле число, наприклад: 150")
-        return
-    await state.update_data(dadan=n)
-    await state.set_state(AddFrames.ruta)
+    try: n=int(msg.text.strip())
+    except: await msg.answer("Введи число, наприклад: 150"); return
+    await state.update_data(dadan=n); await state.set_state(AddFrames.ruta)
     await msg.answer("🔵 Скільки <b>Рута</b>? (0 якщо немає)", parse_mode="HTML")
 
 @dp.message(AddFrames.ruta)
 async def frames_ruta(msg: Message, state: FSMContext):
-    try:
-        n = int(msg.text.strip())
-    except:
-        await msg.answer("Введи ціле число, наприклад: 100")
-        return
-    await state.update_data(ruta=n)
-    await state.set_state(AddFrames.magazynna)
+    try: n=int(msg.text.strip())
+    except: await msg.answer("Введи число, наприклад: 100"); return
+    await state.update_data(ruta=n); await state.set_state(AddFrames.magazynna)
     await msg.answer("🟢 Скільки <b>Магазинна</b>? (0 якщо немає)", parse_mode="HTML")
 
 @dp.message(AddFrames.magazynna)
 async def frames_mag(msg: Message, state: FSMContext):
-    try:
-        n = int(msg.text.strip())
-    except:
-        await msg.answer("Введи ціле число, наприклад: 50")
-        return
+    try: n=int(msg.text.strip())
+    except: await msg.answer("Введи число, наприклад: 50"); return
     await state.update_data(magazynna=n)
-    data = await state.get_data()
-    db   = load_db()
-    w    = worker_by_id(db, data["wid"])
-    p    = data["prices"]
-
-    d_n, r_n, m_n = data["dadan"], data["ruta"], n
-    total = d_n * p.get("dadan", 0) + r_n * p.get("ruta", 0) + m_n * p.get("magazynna", 0)
-
-    parts = []
-    if d_n: parts.append(f"Дадан {d_n} × {p.get('dadan')} = {fmt(d_n * p.get('dadan',0))} ₴")
-    if r_n: parts.append(f"Рута {r_n} × {p.get('ruta')} = {fmt(r_n * p.get('ruta',0))} ₴")
-    if m_n: parts.append(f"Маг. {m_n} × {p.get('magazynna')} = {fmt(m_n * p.get('magazynna',0))} ₴")
-
+    data=await state.get_data(); db=get_db(); w=worker_by_id(db,data["wid"]); p=data["prices"]
+    d_n,r_n,m_n=data["dadan"],data["ruta"],n
+    total=d_n*p.get("dadan",0)+r_n*p.get("ruta",0)+m_n*p.get("magazynna",0)
+    parts=[]
+    if d_n: parts.append(f"Дадан {d_n} × {p.get('dadan')} = {fmt(d_n*p.get('dadan',0))} ₴")
+    if r_n: parts.append(f"Рута {r_n} × {p.get('ruta')} = {fmt(r_n*p.get('ruta',0))} ₴")
+    if m_n: parts.append(f"Маг. {m_n} × {p.get('magazynna')} = {fmt(m_n*p.get('magazynna',0))} ₴")
     if not parts:
-        await msg.answer("Всі значення 0 — нічого не збережено.")
-        await state.clear()
-        return
-
-    text = (f"👷 <b>{w['name']}</b>\n"
-            f"📅 {fmt_date(today_str())}\n\n" +
-            "\n".join(parts) +
-            f"\n\n💰 <b>До нарахування: {fmt(total)} ₴</b>\n\nЗберегти?")
-
+        await msg.answer("Всі 0 — нічого не збережено."); await state.clear(); return
     await state.update_data(magazynna=n, total=total)
-    await msg.answer(text, parse_mode="HTML",
-                     reply_markup=confirm_kb("frames_save"))
+    await msg.answer(f"👷 <b>{w['name']}</b>\n📅 {fmt_date(today_str())}\n\n"+"\n".join(parts)+f"\n\n💰 <b>{fmt(total)} ₴</b>\n\nЗберегти?",
+                     parse_mode="HTML", reply_markup=confirm_kb("frames_save"))
 
 @dp.callback_query(F.data == "frames_save")
 async def frames_save(cb: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    db   = load_db()
-    p    = data["prices"]
-    db["records"].append({
-        "id": gen_id(), "date": today_str(), "type": "frames",
-        "workerId": data["wid"],
-        "dadan": data["dadan"], "ruta": data["ruta"], "magazynna": data["magazynna"],
-        "pDadan": p.get("dadan", 0), "pRuta": p.get("ruta", 0), "pMag": p.get("magazynna", 0),
-        "note": ""
-    })
-    save_db(db)
-    await state.clear()
-    w = worker_by_id(db, data["wid"])
-    await cb.message.edit_text(
-        f"✅ Збережено!\n👷 {w['name']} — нараховано <b>{fmt(data['total'])} ₴</b>",
-        parse_mode="HTML"
-    )
+    data=await state.get_data(); db=get_db(); p=data["prices"]
+    db["records"].append({"id":gen_id(),"date":today_str(),"type":"frames","workerId":data["wid"],
+        "dadan":data["dadan"],"ruta":data["ruta"],"magazynna":data["magazynna"],
+        "pDadan":p.get("dadan",0),"pRuta":p.get("ruta",0),"pMag":p.get("magazynna",0),"note":""})
+    await save_db(db); await state.clear()
+    w=worker_by_id(db,data["wid"])
+    await cb.message.edit_text(f"✅ Збережено! {w['name']} — <b>{fmt(data['total'])} ₴</b>", parse_mode="HTML")
 
-# ── Виплата ───────────────────────────────────────────────────────────────
 @dp.message(F.text == "💰 Виплата")
 async def payment_start(msg: Message, state: FSMContext):
-    db = load_db()
+    db=get_db()
     if not db["workers"]:
-        await msg.answer("Виконавців немає.")
-        return
+        await msg.answer("Виконавців немає."); return
     await state.set_state(AddPayment.worker)
-    await msg.answer("👷 Кому виплата?",
-                     reply_markup=workers_inline_kb(db["workers"], "pay"))
+    await msg.answer("👷 Кому виплата?", reply_markup=workers_kb(db["workers"],"pay"))
 
 @dp.callback_query(AddPayment.worker, F.data.startswith("pay:"))
 async def payment_worker(cb: CallbackQuery, state: FSMContext):
-    wid = cb.data.split(":")[1]
-    db  = load_db()
-    w   = worker_by_id(db, wid)
-    s   = w_stats(w, db["records"])
-    await state.update_data(wid=wid)
-    await state.set_state(AddPayment.amount)
-
-    debt_line = ""
-    if s["debt"] > 0:
-        debt_line = f"\n🔴 Борг: <b>{fmt(s['debt'])} ₴</b>"
-    elif s["debt"] < 0:
-        debt_line = f"\n🟢 Переплата: <b>{fmt(abs(s['debt']))} ₴</b>"
-
-    await cb.message.edit_text(
-        f"👷 <b>{w['name']}</b>{debt_line}\n\nВведи суму виплати (₴):",
-        parse_mode="HTML"
-    )
+    wid=cb.data.split(":")[1]; db=get_db(); w=worker_by_id(db,wid); s=w_stats(w,db["records"])
+    await state.update_data(wid=wid); await state.set_state(AddPayment.amount)
+    debt_line=f"\n🔴 Борг: <b>{fmt(s['debt'])} ₴</b>" if s['debt']>0 else (f"\n🟢 Переплата: <b>{fmt(abs(s['debt']))} ₴</b>" if s['debt']<0 else "")
+    await cb.message.edit_text(f"👷 <b>{w['name']}</b>{debt_line}\n\nВведи суму (₴):", parse_mode="HTML")
 
 @dp.message(AddPayment.amount)
 async def payment_amount(msg: Message, state: FSMContext):
-    try:
-        amount = float(msg.text.strip().replace(",", "."))
-        assert amount > 0
-    except:
-        await msg.answer("Введи суму, наприклад: 1500")
-        return
+    try: amount=float(msg.text.strip().replace(",",".")); assert amount>0
+    except: await msg.answer("Введи суму, наприклад: 1500"); return
     await state.update_data(amount=amount)
-    data = await state.get_data()
-    db   = load_db()
-    w    = worker_by_id(db, data["wid"])
-    await msg.answer(
-        f"👷 <b>{w['name']}</b>\n💰 Виплата: <b>{fmt(amount)} ₴</b>\n\nЗберегти?",
-        parse_mode="HTML",
-        reply_markup=confirm_kb("pay_save")
-    )
+    data=await state.get_data(); w=worker_by_id(get_db(),data["wid"])
+    await msg.answer(f"👷 <b>{w['name']}</b>\n💰 <b>{fmt(amount)} ₴</b>\n\nЗберегти?",
+                     parse_mode="HTML", reply_markup=confirm_kb("pay_save"))
 
 @dp.callback_query(F.data == "pay_save")
 async def payment_save(cb: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    db   = load_db()
-    db["records"].append({
-        "id": gen_id(), "date": today_str(), "type": "payment",
-        "workerId": data["wid"], "amount": data["amount"], "reason": ""
-    })
-    save_db(db)
-    await state.clear()
-    w = worker_by_id(db, data["wid"])
-    await cb.message.edit_text(
-        f"✅ Виплату збережено!\n👷 {w['name']} — <b>{fmt(data['amount'])} ₴</b>",
-        parse_mode="HTML"
-    )
+    data=await state.get_data(); db=get_db()
+    db["records"].append({"id":gen_id(),"date":today_str(),"type":"payment",
+                          "workerId":data["wid"],"amount":data["amount"],"reason":""})
+    await save_db(db); await state.clear()
+    w=worker_by_id(db,data["wid"])
+    await cb.message.edit_text(f"✅ Виплату збережено! {w['name']} — <b>{fmt(data['amount'])} ₴</b>", parse_mode="HTML")
 
-# ── Звіт ──────────────────────────────────────────────────────────────────
 @dp.message(F.text == "📊 Звіт")
 async def report(msg: Message):
-    db     = load_db()
-    stats  = [w_stats(w, db["records"]) for w in db["workers"]]
-    # Last 7 days records
-    recs   = sorted(db["records"], key=lambda r: r["date"], reverse=True)[:20]
-    by_date = {}
-    for r in recs:
-        by_date.setdefault(r["date"], []).append(r)
-
-    lines = ["<b>📊 Звіт по виконавцях:</b>", ""]
+    db=get_db(); stats=[w_stats(w,db["records"]) for w in db["workers"]]
+    lines=["<b>📊 Звіт:</b>"]
     for s in stats:
-        emoji = "🔴" if s["debt"] > 0 else ("🟢" if s["debt"] < 0 else "🟡")
-        lines.append(f"{emoji} <b>{s['name']}</b>: нарах. {fmt(s['earned'])} ₴ | випл. {fmt(s['paid'])} ₴")
-
-    lines += ["", "<b>Останні записи:</b>"]
-    for d in sorted(by_date.keys(), reverse=True):
-        dr = by_date[d]
-        frames_sum = sum(rec_earned(r) for r in dr if r["type"] == "frames")
-        pay_sum    = sum(r.get("amount", 0) for r in dr if r["type"] == "payment")
-        line = f"📅 {fmt_date(d)}"
-        if frames_sum: line += f" | 🔨 {fmt(frames_sum)} ₴"
-        if pay_sum:    line += f" | 💰 −{fmt(pay_sum)} ₴"
-        lines.append(line)
-
+        e="🔴" if s['debt']>0 else ("🟢" if s['debt']<0 else "🟡")
+        lines.append(f"{e} <b>{s['name']}</b>: {fmt(s['earned'])} ₴ нарах. | {fmt(s['paid'])} ₴ випл. | {fmt(abs(s['debt']))} ₴ {'борг' if s['debt']>0 else 'переплата' if s['debt']<0 else '✓'}")
     await msg.answer("\n".join(lines), parse_mode="HTML")
 
-# ── Налаштування ──────────────────────────────────────────────────────────
 @dp.message(F.text == "⚙️ Налаштування")
 async def settings(msg: Message):
-    db = load_db()
-    dp_ = db.get("defaultPrices", {})
-    await msg.answer(
-        f"⚙️ <b>Налаштування</b>\n\n"
-        f"Базові ціни:\n"
-        f"🟠 Дадан: <b>{dp_.get('dadan', '?')} ₴</b>\n"
-        f"🔵 Рута: <b>{dp_.get('ruta', '?')} ₴</b>\n"
-        f"🟢 Магазинна: <b>{dp_.get('magazynna', '?')} ₴</b>\n\n"
-        f"Виконавців: <b>{len(db['workers'])}</b>\n"
-        f"Записів: <b>{len(db['records'])}</b>\n\n"
-        f"Для детального управління — відкрийте додаток 👇",
-        parse_mode="HTML",
-        reply_markup=webapp_kb(WEBAPP_URL)
-    )
+    db=get_db(); dp_=db.get("defaultPrices",{})
+    await msg.answer(f"⚙️ <b>Налаштування</b>\n\nЦіни: Дадан <b>{dp_.get('dadan','?')} ₴</b> | Рута <b>{dp_.get('ruta','?')} ₴</b> | Маг. <b>{dp_.get('magazynna','?')} ₴</b>\n\nВиконавців: <b>{len(db['workers'])}</b> | Записів: <b>{len(db['records'])}</b>",
+                     parse_mode="HTML", reply_markup=webapp_kb())
 
-# ── Cancel ────────────────────────────────────────────────────────────────
 @dp.callback_query(F.data == "cancel")
 async def cancel(cb: CallbackQuery, state: FSMContext):
-    await state.clear()
-    await cb.message.edit_text("❌ Скасовано.")
+    await state.clear(); await cb.message.edit_text("❌ Скасовано.")
 
-# ── Run ───────────────────────────────────────────────────────────────────
 async def main():
-    logger.info("Starting Bees House Bot 🐝")
+    logger.info("🐝 Starting Bees House Bot")
+    await load_db()
+    db=get_db()
+    logger.info(f"DB: {len(db.get('workers',[]))} workers, {len(db.get('records',[]))} records")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
