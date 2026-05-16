@@ -7,7 +7,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Bees House">
 <title>Bees House 🐝</title>
-<!-- Telegram Mini App SDK -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -18,6 +17,7 @@
   --green:#34c759;--green-l:rgba(52,199,89,.12);
   --red:#ff3b30;--red-l:rgba(255,59,48,.12);
   --orange:#ff9500;--orange-l:rgba(255,149,0,.12);
+  --purple:#af52de;--purple-l:rgba(175,82,222,.12);
   --sep:rgba(60,60,67,.12);--shadow:0 1px 6px rgba(0,0,0,.07);
   --r:13px;--rs:9px;
   --safe-top:env(safe-area-inset-top,0px);
@@ -30,22 +30,23 @@
   --green:#30d158;--green-l:rgba(48,209,88,.18);
   --red:#ff453a;--red-l:rgba(255,69,58,.18);
   --orange:#ff9f0a;--orange-l:rgba(255,159,10,.18);
+  --purple:#bf5af2;--purple-l:rgba(191,90,242,.18);
   --sep:rgba(84,84,88,.55);--shadow:0 1px 8px rgba(0,0,0,.4);
 }}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;overscroll-behavior:none;}
-input,select{font-family:inherit;font-size:16px;background:transparent;color:var(--text);outline:none;border:none;width:100%;}
-input::placeholder{color:var(--text3);}
+input,select,textarea{font-family:inherit;font-size:16px;background:transparent;color:var(--text);outline:none;border:none;width:100%;}
+input::placeholder,textarea::placeholder{color:var(--text3);}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:var(--text);font-size:16px;}
 #app{display:flex;flex-direction:column;height:100%;max-width:430px;margin:0 auto;}
 .screen{flex:1;overflow-y:auto;padding-bottom:calc(var(--safe-bot)+80px);display:none;}
 .screen.active{display:block;}
 .hdr{padding:16px 20px 10px;padding-top:calc(var(--safe-top)+16px);background:var(--bg);position:sticky;top:0;z-index:10;}
-.hdr h1{font-size:30px;font-weight:700;letter-spacing:-.5px;}
+.hdr h1{font-size:28px;font-weight:700;letter-spacing:-.5px;}
 .hdr-sub{font-size:13px;color:var(--text2);margin-top:2px;}
 .tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--bg2);border-top:1px solid var(--sep);display:flex;padding-bottom:var(--safe-bot);z-index:100;}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px 4px;gap:3px;font-size:10px;font-weight:500;color:var(--text3);}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 2px 4px;gap:3px;font-size:9px;font-weight:500;color:var(--text3);}
 .tab.on{color:var(--accent);}
-.tab svg{width:24px;height:24px;}
+.tab svg{width:22px;height:22px;}
 .card{background:var(--bg2);border-radius:var(--r);margin:0 16px 12px;overflow:hidden;box-shadow:var(--shadow);}
 .row{padding:13px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--sep);min-height:50px;}
 .row:last-child{border-bottom:none;}
@@ -59,19 +60,22 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:var(
 .br{background:var(--red-l);color:var(--red);}
 .bb{background:var(--accent-l);color:var(--accent);}
 .bo{background:var(--orange-l);color:var(--orange);}
+.bp2{background:var(--purple-l);color:var(--purple);}
 .sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 12px;}
+.sg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 16px 12px;}
 .sc{background:var(--bg2);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);}
 .sl{font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
-.sv{font-size:24px;font-weight:700;}
+.sv{font-size:22px;font-weight:700;}
 .ss{font-size:12px;color:var(--text2);margin-top:3px;}
 .stit{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;padding:14px 20px 7px;}
 .av{border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;}
 .btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:14px 20px;border-radius:var(--r);font-size:16px;font-weight:600;width:100%;}
 .btn:active{opacity:.8;}
-.bp{background:var(--accent);color:#fff;}
-.bd{background:var(--red);color:#fff;}
-.bs{background:var(--bg3);color:var(--text);}
-.bor{background:var(--orange-l);color:var(--orange);}
+.bpa{background:var(--accent);color:#fff;}
+.bpd{background:var(--red);color:#fff;}
+.bps{background:var(--bg3);color:var(--text);}
+.bpo{background:var(--orange-l);color:var(--orange);}
+.bpg{background:var(--green-l);color:var(--green);}
 .fab{position:fixed;bottom:calc(var(--safe-bot)+72px);right:20px;width:54px;height:54px;border-radius:27px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(0,122,255,.45);z-index:50;}
 .ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;}
 .ov.open{display:flex;}
@@ -83,6 +87,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:var(
 .fl{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:7px;display:block;text-transform:uppercase;letter-spacing:.3px;}
 .fi{background:var(--bg2);border-radius:var(--rs);padding:12px 14px;font-size:16px;width:100%;}
 select.fi{-webkit-appearance:none;}
+textarea.fi{resize:none;min-height:72px;}
 .fib{background:var(--bg2);border-radius:12px;padding:12px;text-align:center;}
 .fib input{text-align:center;font-size:22px;font-weight:700;background:var(--bg3);border-radius:8px;padding:8px 4px;width:100%;}
 .pblock{background:var(--bg3);border-radius:10px;padding:10px 8px;text-align:center;}
@@ -91,8 +96,9 @@ select.fi{-webkit-appearance:none;}
 .pblock-unit{font-size:10px;color:var(--text2);margin-top:4px;}
 .pgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .sbox{margin:0 16px 14px;border-radius:11px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
-.chips{padding:0 16px 8px;display:flex;gap:8px;overflow-x:auto;}
-.chip{padding:6px 15px;border-radius:20px;font-size:14px;font-weight:500;background:var(--bg3);color:var(--text2);white-space:nowrap;border:none;cursor:pointer;}
+.chips{padding:0 16px 8px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{padding:6px 15px;border-radius:20px;font-size:14px;font-weight:500;background:var(--bg3);color:var(--text2);white-space:nowrap;border:none;cursor:pointer;flex-shrink:0;}
 .chip.on{background:var(--accent);color:#fff;}
 .empty{text-align:center;padding:32px 20px;color:var(--text2);}
 .cpicker{display:flex;gap:10px;flex-wrap:wrap;}
@@ -106,29 +112,48 @@ select.fi{-webkit-appearance:none;}
 .pbadge{background:var(--bg3);border-radius:8px;padding:4px 10px;font-size:12px;}
 .rrow{display:flex;align-items:stretch;border-bottom:1px solid var(--sep);}
 .rrow:last-child{border-bottom:none;}
-.rrow-body{flex:1;display:flex;align-items:center;gap:10px;padding:12px 8px 12px 16px;min-width:0;cursor:pointer;}
+.rrow-body{flex:1;display:flex;align-items:center;gap:10px;padding:12px 8px 12px 16px;min-width:0;}
 .rrow-del{width:50px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-left:1px solid var(--sep);}
 .rrow-del svg{width:20px;height:20px;stroke:var(--red);}
 .btn-row{display:flex;gap:8px;padding:10px 16px 4px;}
 .btn-row .btn{flex:1;}
 .action-card{background:var(--bg2);border-radius:var(--r);margin:0 16px 12px;box-shadow:var(--shadow);cursor:pointer;}
 .deliv-item{background:var(--bg3);border-radius:10px;padding:11px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
-.deliv-item span:first-child{font-weight:600;font-size:15px;}
-.deliv-item span:last-child{color:var(--text2);font-size:14px;}
 .edit-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
 .edit-row input{background:var(--bg2);border-radius:9px;padding:10px 12px;}
 .lov{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
 .bee{font-size:48px;animation:b .8s infinite alternate;}
 @keyframes b{from{transform:translateY(0)}to{transform:translateY(-12px)}}
 .chev{display:inline-block;vertical-align:middle;flex-shrink:0;}
-/* Telegram theme integration */
-.tg-theme body { background: var(--tg-theme-bg-color, var(--bg)); color: var(--tg-theme-text-color, var(--text)); }
+/* Warehouse */
+.wh-item{background:var(--bg2);border-radius:var(--r);margin:0 16px 10px;box-shadow:var(--shadow);overflow:hidden;}
+.wh-head{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.wh-name{font-size:16px;font-weight:600;}
+.wh-qty{font-size:22px;font-weight:700;}
+.wh-unit{font-size:12px;color:var(--text2);margin-left:4px;}
+.wh-hist{border-top:1px solid var(--sep);}
+.wh-op{padding:10px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--sep);font-size:14px;}
+.wh-op:last-child{border-bottom:none;}
+.wh-op-note{font-size:12px;color:var(--text2);margin-top:2px;}
+/* Report month */
+.month-card{background:var(--bg2);border-radius:var(--r);margin:0 16px 12px;box-shadow:var(--shadow);overflow:hidden;}
+.month-head{padding:14px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;border-bottom:1px solid var(--sep);}
+.month-title{font-size:16px;font-weight:700;}
+.month-body{padding:12px 16px;}
+.fmt-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--sep);}
+.fmt-row:last-child{border-bottom:none;}
+.fmt-name{font-size:14px;font-weight:500;}
+.fmt-val{font-size:14px;font-weight:700;color:var(--orange);}
+.seg{display:flex;background:var(--bg3);border-radius:10px;padding:3px;margin:0 16px 14px;}
+.seg-btn{flex:1;padding:7px;border-radius:8px;font-size:14px;font-weight:600;text-align:center;color:var(--text2);}
+.seg-btn.on{background:var(--bg2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.1);}
 </style>
 </head>
 <body>
 <div class="lov" id="lov"><div class="bee">🐝</div><div style="font-size:16px;font-weight:600;">Завантаження...</div></div>
 <div id="app" style="display:none;">
 
+  <!-- HOME -->
   <div class="screen active" id="s-home">
     <div class="hdr"><h1>Bees House 🐝</h1><div class="hdr-sub" id="today-date"></div></div>
     <div class="sg">
@@ -141,6 +166,7 @@ select.fi{-webkit-appearance:none;}
     <div class="card" id="h-today"></div>
   </div>
 
+  <!-- WORKERS -->
   <div class="screen" id="s-workers">
     <div class="hdr"><h1>Виконавці</h1></div>
     <div class="card" id="w-list"></div>
@@ -149,17 +175,36 @@ select.fi{-webkit-appearance:none;}
     </button>
   </div>
 
+  <!-- ADD -->
   <div class="screen" id="s-add">
     <div class="hdr"><h1>Додати</h1></div>
     <div id="add-content"></div>
   </div>
 
+  <!-- REPORT -->
   <div class="screen" id="s-report">
     <div class="hdr"><h1>Звіт</h1></div>
-    <div class="chips" id="report-chips"></div>
-    <div id="report-content"></div>
+    <div class="seg" id="rep-seg">
+      <div class="seg-btn on" onclick="repTab('workers',this)">Виконавці</div>
+      <div class="seg-btn" onclick="repTab('frames',this)">Рамки</div>
+    </div>
+    <div id="rep-workers"></div>
+    <div id="rep-frames" style="display:none;"></div>
   </div>
 
+  <!-- WAREHOUSE -->
+  <div class="screen" id="s-warehouse">
+    <div class="hdr"><h1>Склад 📦</h1></div>
+    <div class="stit">Готова продукція</div>
+    <div id="wh-finished"></div>
+    <div class="stit" style="display:flex;justify-content:space-between;align-items:center;padding-right:16px;">
+      <span>Матеріали</span>
+      <button onclick="openAddWhItem()" style="color:var(--accent);font-size:14px;font-weight:600;">+ Позиція</button>
+    </div>
+    <div id="wh-materials"></div>
+  </div>
+
+  <!-- SETTINGS -->
   <div class="screen" id="s-settings">
     <div class="hdr"><h1>Налаштування</h1></div>
     <div class="stit">Базові ціни (₴/шт)</div>
@@ -170,7 +215,7 @@ select.fi{-webkit-appearance:none;}
         <div class="pblock"><div class="pblock-label" style="color:var(--accent)">Рута</div><input type="number" inputmode="decimal" id="dp-r"><div class="pblock-unit">₴/шт</div></div>
         <div class="pblock"><div class="pblock-label" style="color:var(--green)">Маг.</div><input type="number" inputmode="decimal" id="dp-m"><div class="pblock-unit">₴/шт</div></div>
       </div>
-      <button class="btn bp" style="margin-bottom:12px;" onclick="saveDefPrices()">Зберегти базові ціни</button>
+      <button class="btn bpa" style="margin-bottom:12px;" onclick="saveDefPrices()">Зберегти базові ціни</button>
     </div>
     <div class="stit">Дані</div>
     <div class="card">
@@ -179,12 +224,9 @@ select.fi{-webkit-appearance:none;}
       <div class="row"><div class="rm"><div class="rt">Збереження</div></div><span class="badge bg" id="st-s">💾 Локально</span></div>
     </div>
     <div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:10px;">
-      <button class="btn bor" onclick="exportData()">📤 Експорт (резервна копія)</button>
-      <label class="btn bs" style="cursor:pointer;">
-        📥 Імпорт даних
-        <input type="file" accept=".json" style="display:none;" onchange="importData(event)">
-      </label>
-      <button class="btn bd" onclick="clearAll()">Очистити всі записи</button>
+      <button class="btn bpo" onclick="exportData()">📤 Експорт (резервна копія)</button>
+      <label class="btn bps" style="cursor:pointer;">📥 Імпорт даних<input type="file" accept=".json" style="display:none;" onchange="importData(event)"></label>
+      <button class="btn bpd" onclick="clearAll()">Очистити всі записи</button>
     </div>
   </div>
 
@@ -205,14 +247,14 @@ select.fi{-webkit-appearance:none;}
       <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       Звіт
     </button>
-    <button class="tab" onclick="goTab('settings',this)">
-      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      Налаш.
+    <button class="tab" onclick="goTab('warehouse',this)">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      Склад
     </button>
   </nav>
 </div>
 
-<!-- Modals (same as original) -->
+<!-- MODALS -->
 <div class="ov" id="m-worker" onclick="ovClick(event,this)">
   <div class="modal">
     <div class="mh"></div>
@@ -228,7 +270,7 @@ select.fi{-webkit-appearance:none;}
         <div class="pblock"><div class="pblock-label" style="color:var(--green)">Маг.</div><input type="number" inputmode="decimal" id="wp-m"><div class="pblock-unit">₴/шт</div></div>
       </div>
     </div>
-    <div class="fg"><button class="btn bp" onclick="saveWorker()">Зберегти</button></div>
+    <div class="fg"><button class="btn bpa" onclick="saveWorker()">Зберегти</button></div>
   </div>
 </div>
 
@@ -258,7 +300,7 @@ select.fi{-webkit-appearance:none;}
     <div id="f-total" style="display:none;" class="sbox"><span style="color:var(--text2);font-size:14px;">До нарахування:</span><span id="f-tv" style="color:var(--orange);font-size:22px;font-weight:700;"></span></div>
     <div class="fg"><label class="fl">Дата</label><input type="date" class="fi" id="f-date"></div>
     <div class="fg"><label class="fl">Примітка</label><input class="fi" id="f-note" placeholder="Необов'язково..."></div>
-    <div class="fg"><button class="btn bp" onclick="saveFrames()">Зберегти</button></div>
+    <div class="fg"><button class="btn bpa" onclick="saveFrames()">Зберегти</button></div>
   </div>
 </div>
 
@@ -275,7 +317,7 @@ select.fi{-webkit-appearance:none;}
     </div>
     <div class="fg"><label class="fl">Дата</label><input type="date" class="fi" id="d-date"></div>
     <div class="fg"><label class="fl">Примітка</label><input class="fi" id="d-note" placeholder="Необов'язково..."></div>
-    <div class="fg"><button class="btn bp" onclick="saveDelivery()">Зберегти</button></div>
+    <div class="fg"><button class="btn bpa" onclick="saveDelivery()">Зберегти</button></div>
   </div>
 </div>
 
@@ -288,7 +330,7 @@ select.fi{-webkit-appearance:none;}
     <div class="fg"><label class="fl">Сума (₴)</label><input type="number" inputmode="decimal" class="fi" id="p-amount" placeholder="0" style="font-size:26px;font-weight:700;"></div>
     <div class="fg"><label class="fl">Дата</label><input type="date" class="fi" id="p-date"></div>
     <div class="fg"><label class="fl">За що</label><input class="fi" id="p-reason" placeholder="Аванс, зарплата..."></div>
-    <div class="fg"><button class="btn bp" onclick="savePayment()">Зберегти</button></div>
+    <div class="fg"><button class="btn bpa" onclick="savePayment()">Зберегти</button></div>
   </div>
 </div>
 
@@ -299,26 +341,56 @@ select.fi{-webkit-appearance:none;}
   <div class="modal"><div class="mh"></div><div id="wdetail-body"></div></div>
 </div>
 
+<!-- Warehouse: add/edit item -->
+<div class="ov" id="m-wh-item" onclick="ovClick(event,this)">
+  <div class="modal">
+    <div class="mh"></div>
+    <div class="mt" id="wh-item-title">Нова позиція</div>
+    <input type="hidden" id="wh-item-id">
+    <div class="fg"><label class="fl">Назва</label><input class="fi" id="wh-item-name" placeholder="Наприклад: Корпус вулика 145"></div>
+    <div class="fg"><label class="fl">Одиниця виміру</label><input class="fi" id="wh-item-unit" placeholder="шт, кг, м..."></div>
+    <div class="fg"><label class="fl">Початкова кількість</label><input type="number" inputmode="numeric" class="fi" id="wh-item-qty" placeholder="0"></div>
+    <div class="fg"><button class="btn bpa" onclick="saveWhItem()">Зберегти</button></div>
+  </div>
+</div>
+
+<!-- Warehouse: operation (income/outcome) -->
+<div class="ov" id="m-wh-op" onclick="ovClick(event,this)">
+  <div class="modal">
+    <div class="mh"></div>
+    <div class="mt" id="wh-op-title">Операція</div>
+    <input type="hidden" id="wh-op-item-id">
+    <input type="hidden" id="wh-op-type">
+    <div class="fg"><label class="fl">Кількість</label><input type="number" inputmode="numeric" class="fi" id="wh-op-qty" placeholder="0" style="font-size:26px;font-weight:700;"></div>
+    <div class="fg"><label class="fl">Дата</label><input type="date" class="fi" id="wh-op-date"></div>
+    <div class="fg"><label class="fl">Примітка</label><textarea class="fi" id="wh-op-note" placeholder="Куди, від кого, деталі..."></textarea></div>
+    <div class="fg"><button class="btn bpa" onclick="saveWhOp()">Зберегти</button></div>
+  </div>
+</div>
+
 <script>
-// ── Telegram WebApp init ──────────────────────────────────────────────────
+// ── Telegram ──────────────────────────────────────────────────────────────
 const tg = window.Telegram?.WebApp;
-if (tg) {
-  tg.ready();
-  tg.expand();
-  // Apply Telegram theme colors if available
-  if (tg.colorScheme === 'dark') {
-    document.documentElement.style.setProperty('--bg', tg.themeParams?.bg_color || '#1c1c1e');
-    document.documentElement.style.setProperty('--text', tg.themeParams?.text_color || '#ffffff');
-  }
-}
+if(tg){tg.ready();tg.expand();}
+
+// ── API ───────────────────────────────────────────────────────────────────
+const API_URL = 'https://bees-house-bot-production.up.railway.app';
 
 // ── Constants ─────────────────────────────────────────────────────────────
-const LKEY = 'ramy_v4';
+const LKEY = 'ramy_v5';
 const DEF = {dadan:4.5, ruta:3.5, magazynna:3.0};
 const COLORS = ['#007aff','#34c759','#ff9500','#ff3b30','#af52de','#5856d6','#ff2d55'];
+// Готова продукція (фіксовані)
+const FINISHED_PRODUCTS = [
+  {id:'fp-dadan',   name:'Дадан (435×300) у зборі',     unit:'шт', frameKey:'dadan'},
+  {id:'fp-ruta',    name:'Рута (435×230) у зборі',       unit:'шт', frameKey:'ruta'},
+  {id:'fp-mag',     name:'Магазинна (435×145) у зборі',  unit:'шт', frameKey:'magazynna'},
+];
+
 let DB = null;
 let selColor = COLORS[0];
 
+// ── SVG Icons ─────────────────────────────────────────────────────────────
 const IC = {
   hammer:`<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M15 12l-8.5 8.5a2.12 2.12 0 0 1-3-3L12 9"/><path d="M17.64 15L22 10.64"/><path d="M20.91 11.7l-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86L16.01 4.6a5.56 5.56 0 0 0-3.94-1.64H9l.92.82A6.18 6.18 0 0 1 12 8.4v1.56l2 2h2.47l2.26 1.91"/></svg>`,
   box:`<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
@@ -326,66 +398,68 @@ const IC = {
   trash:`<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`,
   edit:`<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
   chev:`<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>`,
+  plus:`<svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  minus:`<svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
 };
 
-// ── API Config ────────────────────────────────────────────────────────────
-const API_URL = 'https://bees-house-bot-production.up.railway.app';
-
 // ── Storage ───────────────────────────────────────────────────────────────
-function loadDB() {
-  // Fallback to localStorage if API not available
-  try { const s=localStorage.getItem(LKEY); if(s) return JSON.parse(s); } catch(e){}
+function loadLocalDB(){
+  try{const s=localStorage.getItem(LKEY);if(s)return JSON.parse(s);}catch(e){}
+  // migrate from old key
+  try{const s=localStorage.getItem('ramy_v4');if(s){const d=JSON.parse(s);return migrateDB(d);}}catch(e){}
   return null;
 }
-function saveDB() {
-  // Save to localStorage as backup
-  try { localStorage.setItem(LKEY, JSON.stringify(DB)); } catch(e){}
-  // Save to API (async, don't block UI)
-  fetch(API_URL+'/db', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(DB)
-  }).then(r=>r.json()).then(d=>{
-    const el=document.getElementById('st-s');
-    if(el) el.textContent = d.ok ? '☁️ Синхронізовано' : '💾 Локально';
-  }).catch(()=>{
-    const el=document.getElementById('st-s');
-    if(el) el.textContent = '💾 Локально';
-  });
+
+function migrateDB(d){
+  // Add warehouse if missing
+  if(!d.warehouse) d.warehouse = {items:[], operations:[]};
+  return d;
 }
-async function loadFromAPI() {
-  try {
-    const r = await fetch(API_URL+'/db');
-    if(r.ok) {
-      const data = await r.json();
-      if(data.workers && data.records) {
-        DB = data;
-        try { localStorage.setItem(LKEY, JSON.stringify(DB)); } catch(e){}
+
+function saveDB(){
+  try{localStorage.setItem(LKEY, JSON.stringify(DB));}catch(e){}
+  fetch(API_URL+'/db',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(DB)})
+    .then(r=>r.json()).then(d=>{
+      const el=document.getElementById('st-s');
+      if(el)el.textContent=d.ok?'☁️ Синхронізовано':'💾 Локально';
+    }).catch(()=>{const el=document.getElementById('st-s');if(el)el.textContent='💾 Локально';});
+}
+
+async function loadFromAPI(){
+  try{
+    const r=await fetch(API_URL+'/db');
+    if(r.ok){
+      const data=await r.json();
+      if(data.workers&&data.records){
+        DB=migrateDB(data);
+        try{localStorage.setItem(LKEY,JSON.stringify(DB));}catch(e){}
         return true;
       }
     }
-  } catch(e) { console.log('API load failed, using localStorage'); }
+  }catch(e){console.log('API load failed');}
   return false;
 }
-function exportData() {
-  try {
+
+function exportData(){
+  try{
     const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
     a.href=url;a.download='bees-house-backup-'+todayStr()+'.json';
     document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
-  } catch(e) { prompt('Скопіюйте дані:', JSON.stringify(DB)); }
+  }catch(e){prompt('Скопіюйте дані:',JSON.stringify(DB));}
 }
-function importData(e) {
+
+function importData(e){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=ev=>{
-    try {
+    try{
       const d=JSON.parse(ev.target.result);
-      if(!d.workers||!d.records) throw new Error();
-      DB=d;saveDB();renderHome();renderSettings();
+      if(!d.workers||!d.records)throw new Error();
+      DB=migrateDB(d);saveDB();renderHome();renderSettings();
       alert('✅ Імпортовано: '+d.workers.length+' виконавців');
-    } catch { alert('❌ Невірний файл'); }
+    }catch{alert('❌ Невірний файл');}
   };
   reader.readAsText(file);e.target.value='';
 }
@@ -394,9 +468,11 @@ function importData(e) {
 const gid=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
 const todayStr=()=>new Date().toISOString().slice(0,10);
 const fmtDate=iso=>new Date(iso+'T00:00:00').toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'});
+const fmtMonth=iso=>{const d=new Date(iso+'T00:00:00');return d.toLocaleDateString('uk-UA',{month:'long',year:'numeric'});};
 const fmt=n=>{const f=Math.round((+n||0)*100)/100;return f%1===0?f.toLocaleString('uk-UA'):f.toLocaleString('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2});};
 const wp=w=>({d:w.prices?.dadan??DEF.dadan,r:w.prices?.ruta??DEF.ruta,m:w.prices?.magazynna??DEF.magazynna});
 const recEarned=r=>(r.dadan||0)*(r.pDadan||0)+(r.ruta||0)*(r.pRuta||0)+(r.magazynna||0)*(r.pMag||r.pMagazynna||0);
+
 function wStats(w){
   const recs=DB.records.filter(r=>r.workerId===w.id);
   const earned=recs.filter(r=>r.type==='frames').reduce((s,r)=>s+recEarned(r),0);
@@ -404,20 +480,41 @@ function wStats(w){
   const frames=recs.filter(r=>r.type==='frames').reduce((s,r)=>s+(r.dadan||0)+(r.ruta||0)+(r.magazynna||0),0);
   return {...w,earned,paid,debt:earned-paid,frames,recs};
 }
+
 function recIcon(type){
   if(type==='frames')return{ic:'hammer',bg:'var(--orange-l)'};
   if(type==='delivery')return{ic:'box',bg:'var(--accent-l)'};
   return{ic:'money',bg:'var(--green-l)'};
 }
+
 function recTitle(r){
   if(r.type==='frames'){const p=[];if(r.dadan)p.push(`Дадан ×${r.dadan}`);if(r.ruta)p.push(`Рута ×${r.ruta}`);if(r.magazynna)p.push(`Маг. ×${r.magazynna}`);return p.join(', ')||'Рамки';}
   if(r.type==='delivery')return(r.items||[]).map(i=>i.name+(i.qty?' ×'+i.qty:'')).join(', ')||'Завезення';
   return`Виплата: ${fmt(r.amount)} ₴`;
 }
+
 function recAmt(r){
   if(r.type==='frames')return`<span style="color:var(--orange);font-weight:700;font-size:14px;flex-shrink:0;">+${fmt(recEarned(r))} ₴</span>`;
   if(r.type==='payment')return`<span style="color:var(--green);font-weight:700;font-size:14px;flex-shrink:0;">−${fmt(r.amount)} ₴</span>`;
   return'';
+}
+
+// Warehouse helpers
+function getWhItemQty(itemId){
+  const ops=DB.warehouse.operations.filter(o=>o.itemId===itemId);
+  return ops.reduce((s,o)=>s+(o.type==='in'?o.qty:-o.qty),0);
+}
+
+function getFinishedQty(frameKey){
+  // From frames records
+  const fromFrames=DB.records.filter(r=>r.type==='frames').reduce((s,r)=>s+(r[frameKey]||0),0);
+  // Minus outgoing operations
+  const fpId='fp-'+frameKey.replace('magazynna','mag');
+  const fpItem=FINISHED_PRODUCTS.find(p=>p.frameKey===frameKey);
+  if(!fpItem)return fromFrames;
+  const ops=DB.warehouse.operations.filter(o=>o.itemId===fpItem.id);
+  const outgoing=ops.filter(o=>o.type==='out').reduce((s,o)=>s+o.qty,0);
+  return fromFrames-outgoing;
 }
 
 // ── Navigation ────────────────────────────────────────────────────────────
@@ -430,7 +527,14 @@ function goTab(id,el){
   if(id==='workers')renderWorkers();
   if(id==='add')renderAdd();
   if(id==='report')renderReport();
+  if(id==='warehouse')renderWarehouse();
   if(id==='settings')renderSettings();
+}
+
+function goTabByIdx(i){
+  const ids=['home','workers','add','report','warehouse'];
+  // settings is not in tabbar
+  goTab(ids[i]||'home',document.querySelectorAll('.tab')[i]||document.querySelectorAll('.tab')[0]);
 }
 
 // ── Home ──────────────────────────────────────────────────────────────────
@@ -457,7 +561,7 @@ function renderHome(){
   const today=todayStr();
   const tRecs=DB.records.filter(r=>r.date===today).slice(-8).reverse();
   const tEl=document.getElementById('h-today');
-  tEl.innerHTML=tRecs.length?tRecs.map(r=>rrowHtml(r,true,false)).join(''):`<div class="empty" style="padding:16px;">Ще немає записів сьогодні</div>`;
+  tEl.innerHTML=tRecs.length?tRecs.map(r=>rrowHtml(r,true)).join(''):`<div class="empty" style="padding:16px;">Ще немає записів сьогодні</div>`;
 }
 
 // ── Workers ───────────────────────────────────────────────────────────────
@@ -480,15 +584,15 @@ function renderWorkers(){
 function renderAdd(){
   const el=document.getElementById('add-content');
   if(!DB.workers.length){
-    el.innerHTML=`<div style="padding:20px 16px;"><div class="card" style="padding:24px;text-align:center;"><div style="font-size:44px;margin-bottom:12px;">👷</div><div style="font-weight:700;font-size:17px;margin-bottom:8px;">Спочатку додайте виконавця</div><button class="btn bp" onclick="goTabByIdx(1);setTimeout(()=>openAddWorker(null),100);">+ Додати виконавця</button></div></div>`;
+    el.innerHTML=`<div style="padding:20px 16px;"><div class="card" style="padding:24px;text-align:center;"><div style="font-size:44px;margin-bottom:12px;">👷</div><div style="font-weight:700;font-size:17px;margin-bottom:8px;">Спочатку додайте виконавця</div><button class="btn bpa" onclick="goTabByIdx(1);setTimeout(()=>openAddWorker(null),100);">+ Додати виконавця</button></div></div>`;
     return;
   }
   el.innerHTML=[
-    {id:'m-frames',ic:'hammer',bg:'var(--orange-l)',label:'Збиті рамки',desc:'Записати та нарахувати оплату'},
-    {id:'m-delivery',ic:'box',bg:'var(--accent-l)',label:'Завезення',desc:'Матеріали та заготовки'},
-    {id:'m-payment',ic:'money',bg:'var(--green-l)',label:'Видати гроші',desc:'Виплата виконавцю'},
+    {id:'frames',ic:'hammer',bg:'var(--orange-l)',label:'Збиті рамки',desc:'Записати та нарахувати оплату'},
+    {id:'delivery',ic:'box',bg:'var(--accent-l)',label:'Завезення',desc:'Матеріали та заготовки'},
+    {id:'payment',ic:'money',bg:'var(--green-l)',label:'Видати гроші',desc:'Виплата виконавцю'},
   ].map(a=>`
-    <div class="action-card" onclick="openModal_${a.id.replace('m-','')}()">
+    <div class="action-card" onclick="openModal_${a.id}()">
       <div class="row" style="padding:18px 16px;">
         <div class="ri" style="background:${a.bg};width:50px;height:50px;border-radius:14px;">${IC[a.ic]}</div>
         <div class="rm"><div class="rt" style="font-size:17px;">${a.label}</div><div class="rs">${a.desc}</div></div>
@@ -498,22 +602,243 @@ function renderAdd(){
 }
 
 // ── Report ────────────────────────────────────────────────────────────────
-let repFilter='all';
+let _repTab='workers';
+function repTab(tab,el){
+  _repTab=tab;
+  document.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('rep-workers').style.display=tab==='workers'?'':'none';
+  document.getElementById('rep-frames').style.display=tab==='frames'?'':'none';
+  if(tab==='frames')renderFramesReport();
+  else renderWorkersReport();
+}
+
 function renderReport(){
-  document.getElementById('report-chips').innerHTML=[{id:'all',name:'Всі'},...DB.workers].map(w=>`<button class="chip ${repFilter===w.id?'on':''}" onclick="repFilter='${w.id}';renderReport()">${w.name||'Всі'}</button>`).join('');
-  const recs=DB.records.filter(r=>repFilter==='all'||r.workerId===repFilter);
+  renderWorkersReport();
+  if(_repTab==='frames')renderFramesReport();
+}
+
+function renderWorkersReport(){
+  const el=document.getElementById('rep-workers');
+  const stats=DB.workers.map(wStats);
+  if(!stats.length){el.innerHTML=`<div class="empty">📄<br>Немає виконавців</div>`;return;}
+
+  const recs=DB.records;
   const byDate={};
   recs.forEach(r=>{if(!byDate[r.date])byDate[r.date]=[];byDate[r.date].push(r);});
   const dates=Object.keys(byDate).sort((a,b)=>b.localeCompare(a));
-  const el=document.getElementById('report-content');
-  if(!dates.length){el.innerHTML=`<div class="empty">📄<br>Записів немає</div>`;return;}
-  el.innerHTML=dates.map(date=>{
-    const dr=byDate[date];
-    const dF=dr.filter(r=>r.type==='frames').reduce((s,r)=>s+(r.dadan||0)+(r.ruta||0)+(r.magazynna||0),0);
-    const dE=dr.filter(r=>r.type==='frames').reduce((s,r)=>s+recEarned(r),0);
-    const dP=dr.filter(r=>r.type==='payment').reduce((s,r)=>s+(r.amount||0),0);
-    return`<div style="padding:12px 20px 6px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;">${fmtDate(date)}</span><div style="display:flex;gap:6px;">${dF>0?`<span class="badge bo">${dF} рам. · ${fmt(dE)} ₴`+`</span>`:''} ${dP>0?`<span class="badge bg">−${fmt(dP)} ₴</span>`:''}</div></div><div class="card">${dr.map(r=>rrowHtml(r,true,false)).join('')}</div>`;
+
+  let html=`<div class="stit">Підсумок</div><div class="card">`;
+  stats.forEach(s=>{
+    html+=`<div class="row">
+      <div class="av" style="width:36px;height:36px;background:${s.color||COLORS[0]}25;"><span style="color:${s.color||COLORS[0]};font-size:15px;">${(s.name||'?')[0].toUpperCase()}</span></div>
+      <div class="rm"><div class="rt">${s.name}</div><div class="rs">${s.frames} рам. · нарах. ${fmt(s.earned)} ₴</div></div>
+      <span class="badge ${s.debt>0?'br':s.debt<0?'bg':'bb'}">${s.debt>0?'Борг '+fmt(s.debt)+' ₴':s.debt<0?'+'+fmt(Math.abs(s.debt))+' ₴':'✓'}</span>
+    </div>`;
+  });
+  html+=`</div>`;
+
+  if(dates.length){
+    html+=`<div class="stit">Записи по датах</div>`;
+    dates.forEach(date=>{
+      const dr=byDate[date];
+      const dF=dr.filter(r=>r.type==='frames').reduce((s,r)=>s+(r.dadan||0)+(r.ruta||0)+(r.magazynna||0),0);
+      const dE=dr.filter(r=>r.type==='frames').reduce((s,r)=>s+recEarned(r),0);
+      const dP=dr.filter(r=>r.type==='payment').reduce((s,r)=>s+(r.amount||0),0);
+      html+=`<div style="padding:12px 20px 6px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:13px;font-weight:700;color:var(--text2);">${fmtDate(date)}</span>
+        <div style="display:flex;gap:6px;">
+          ${dF>0?`<span class="badge bo">${dF} рам. · ${fmt(dE)} ₴</span>`:''}
+          ${dP>0?`<span class="badge bg">−${fmt(dP)} ₴</span>`:''}
+        </div>
+      </div><div class="card">${dr.map(r=>rrowHtml(r,true)).join('')}</div>`;
+    });
+  }
+  el.innerHTML=html;
+}
+
+function renderFramesReport(){
+  const el=document.getElementById('rep-frames');
+  const frameRecs=DB.records.filter(r=>r.type==='frames');
+  if(!frameRecs.length){el.innerHTML=`<div class="empty">🔨<br>Немає записів збивки</div>`;return;}
+
+  // Group by month
+  const byMonth={};
+  frameRecs.forEach(r=>{
+    const month=r.date.slice(0,7); // YYYY-MM
+    if(!byMonth[month])byMonth[month]={dadan:0,ruta:0,magazynna:0,total:0,earned:0};
+    byMonth[month].dadan+=(r.dadan||0);
+    byMonth[month].ruta+=(r.ruta||0);
+    byMonth[month].magazynna+=(r.magazynna||0);
+    byMonth[month].total+=(r.dadan||0)+(r.ruta||0)+(r.magazynna||0);
+    byMonth[month].earned+=recEarned(r);
+  });
+
+  // Total
+  const total={dadan:0,ruta:0,magazynna:0,total:0,earned:0};
+  Object.values(byMonth).forEach(m=>{total.dadan+=m.dadan;total.ruta+=m.ruta;total.magazynna+=m.magazynna;total.total+=m.total;total.earned+=m.earned;});
+
+  let html=`<div class="stit">Всього</div>
+  <div class="sg3">
+    <div class="sc"><div class="sl" style="color:var(--orange)">Дадан 300</div><div class="sv">${total.dadan}</div><div class="ss">шт</div></div>
+    <div class="sc"><div class="sl" style="color:var(--accent)">Рута 230</div><div class="sv">${total.ruta}</div><div class="ss">шт</div></div>
+    <div class="sc"><div class="sl" style="color:var(--green)">Маг. 145</div><div class="sv">${total.magazynna}</div><div class="ss">шт</div></div>
+  </div>
+  <div class="card" style="margin:0 16px 12px;padding:14px 16px;">
+    <div style="display:flex;justify-content:space-between;"><span style="color:var(--text2);">Всього рамок:</span><strong>${total.total} шт</strong></div>
+    <div style="display:flex;justify-content:space-between;margin-top:6px;"><span style="color:var(--text2);">Нараховано:</span><strong style="color:var(--orange);">${fmt(total.earned)} ₴</strong></div>
+  </div>
+  <div class="stit">По місяцях</div>`;
+
+  const months=Object.keys(byMonth).sort((a,b)=>b.localeCompare(a));
+  months.forEach(month=>{
+    const m=byMonth[month];
+    const label=new Date(month+'-01').toLocaleDateString('uk-UA',{month:'long',year:'numeric'});
+    html+=`<div class="month-card">
+      <div class="month-head">
+        <span class="month-title">${label}</span>
+        <span class="badge bo">${m.total} рам.</span>
+      </div>
+      <div class="month-body">
+        <div class="fmt-row"><span class="fmt-name">🟠 Дадан (435×300)</span><span class="fmt-val">${m.dadan} шт</span></div>
+        <div class="fmt-row"><span class="fmt-name">🔵 Рута (435×230)</span><span class="fmt-val">${m.ruta} шт</span></div>
+        <div class="fmt-row"><span class="fmt-name">🟢 Магазинна (435×145)</span><span class="fmt-val">${m.magazynna} шт</span></div>
+        <div class="fmt-row" style="margin-top:4px;"><span class="fmt-name" style="color:var(--text2);">Нараховано</span><span style="font-size:14px;font-weight:700;color:var(--orange);">${fmt(m.earned)} ₴</span></div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+// ── Warehouse ─────────────────────────────────────────────────────────────
+function renderWarehouse(){
+  // Finished products
+  const fpEl=document.getElementById('wh-finished');
+  fpEl.innerHTML=FINISHED_PRODUCTS.map(fp=>{
+    const qty=getFinishedQty(fp.frameKey);
+    const ops=DB.warehouse.operations.filter(o=>o.itemId===fp.id&&o.type==='out').slice(-3).reverse();
+    return`<div class="wh-item">
+      <div class="wh-head" onclick="toggleWhHist('fp-hist-${fp.id}')">
+        <div>
+          <div class="wh-name">${fp.name}</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px;">Автоматично зі збивки</div>
+        </div>
+        <div style="text-align:right;">
+          <span class="wh-qty" style="color:var(--green);">${qty}</span><span class="wh-unit">${fp.unit}</span>
+          <div style="margin-top:4px;">
+            <button onclick="event.stopPropagation();openWhOp('${fp.id}','${fp.name}','out')" class="badge br" style="cursor:pointer;">− Видати</button>
+          </div>
+        </div>
+      </div>
+      ${ops.length?`<div class="wh-hist" id="fp-hist-${fp.id}" style="display:none;">${ops.map(o=>`
+        <div class="wh-op">
+          <div><div>Видано: ${o.qty} ${fp.unit}</div>${o.note?`<div class="wh-op-note">💬 ${o.note}</div>`:''}</div>
+          <div style="text-align:right;font-size:12px;color:var(--text2);">${fmtDate(o.date)}</div>
+        </div>`).join('')}</div>`:''}
+    </div>`;
   }).join('');
+
+  // Materials
+  const matEl=document.getElementById('wh-materials');
+  const items=DB.warehouse.items;
+  if(!items.length){
+    matEl.innerHTML=`<div class="empty">Додайте позиції складу</div>`;
+    return;
+  }
+  matEl.innerHTML=items.map(item=>{
+    const qty=getWhItemQty(item.id);
+    const ops=DB.warehouse.operations.filter(o=>o.itemId===item.id).slice(-5).reverse();
+    return`<div class="wh-item">
+      <div class="wh-head" onclick="toggleWhHist('mat-hist-${item.id}')">
+        <div style="flex:1;">
+          <div class="wh-name">${item.name}</div>
+          <div style="display:flex;gap:6px;margin-top:6px;">
+            <button onclick="event.stopPropagation();openWhOp('${item.id}','${item.name}','in')" class="badge bg" style="cursor:pointer;">+ Прихід</button>
+            <button onclick="event.stopPropagation();openWhOp('${item.id}','${item.name}','out')" class="badge br" style="cursor:pointer;">− Видати</button>
+            <button onclick="event.stopPropagation();openEditWhItem('${item.id}')" style="color:var(--text2);padding:2px 6px;font-size:12px;">${IC.edit}</button>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:12px;">
+          <span class="wh-qty" style="color:${qty>0?'var(--green)':qty<0?'var(--red)':'var(--text2)'};">${qty}</span>
+          <span class="wh-unit">${item.unit||'шт'}</span>
+        </div>
+      </div>
+      ${ops.length?`<div class="wh-hist" id="mat-hist-${item.id}" style="display:none;">${ops.map(o=>`
+        <div class="wh-op">
+          <div>
+            <div><span style="color:${o.type==='in'?'var(--green)':'var(--red)'};">${o.type==='in'?'+':'-'}${o.qty} ${item.unit||'шт'}</span> ${o.type==='in'?'Прихід':'Видача'}</div>
+            ${o.note?`<div class="wh-op-note">💬 ${o.note}</div>`:''}
+          </div>
+          <div style="text-align:right;font-size:12px;color:var(--text2);">${fmtDate(o.date)}</div>
+        </div>`).join('')}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function toggleWhHist(id){
+  const el=document.getElementById(id);
+  if(el)el.style.display=el.style.display==='none'?'block':'none';
+}
+
+// ── Warehouse modals ──────────────────────────────────────────────────────
+function openAddWhItem(){
+  document.getElementById('wh-item-id').value='';
+  document.getElementById('wh-item-title').textContent='Нова позиція';
+  document.getElementById('wh-item-name').value='';
+  document.getElementById('wh-item-unit').value='шт';
+  document.getElementById('wh-item-qty').value='0';
+  openModal('m-wh-item');
+}
+
+function openEditWhItem(id){
+  const item=DB.warehouse.items.find(i=>i.id===id);if(!item)return;
+  document.getElementById('wh-item-id').value=id;
+  document.getElementById('wh-item-title').textContent='Редагувати позицію';
+  document.getElementById('wh-item-name').value=item.name;
+  document.getElementById('wh-item-unit').value=item.unit||'шт';
+  document.getElementById('wh-item-qty').value='';
+  openModal('m-wh-item');
+}
+
+function saveWhItem(){
+  const name=document.getElementById('wh-item-name').value.trim();
+  if(!name){alert('Введіть назву');return;}
+  const unit=document.getElementById('wh-item-unit').value.trim()||'шт';
+  const id=document.getElementById('wh-item-id').value;
+  if(id){
+    DB.warehouse.items=DB.warehouse.items.map(i=>i.id===id?{...i,name,unit}:i);
+  } else {
+    const newId=gid();
+    DB.warehouse.items.push({id:newId,name,unit});
+    const initQty=parseInt(document.getElementById('wh-item-qty').value)||0;
+    if(initQty>0){
+      DB.warehouse.operations.push({id:gid(),itemId:newId,type:'in',qty:initQty,date:todayStr(),note:'Початковий залишок'});
+    }
+  }
+  saveDB();closeModal('m-wh-item');renderWarehouse();
+}
+
+function openWhOp(itemId,itemName,type){
+  document.getElementById('wh-op-item-id').value=itemId;
+  document.getElementById('wh-op-type').value=type;
+  document.getElementById('wh-op-title').textContent=(type==='in'?'📥 Прихід: ':'📤 Видача: ')+itemName;
+  document.getElementById('wh-op-qty').value='';
+  document.getElementById('wh-op-date').value=todayStr();
+  document.getElementById('wh-op-note').value='';
+  openModal('m-wh-op');
+}
+
+function saveWhOp(){
+  const qty=parseInt(document.getElementById('wh-op-qty').value)||0;
+  if(!qty){alert('Введіть кількість');return;}
+  const itemId=document.getElementById('wh-op-item-id').value;
+  const type=document.getElementById('wh-op-type').value;
+  DB.warehouse.operations.push({
+    id:gid(),itemId,type,qty,
+    date:document.getElementById('wh-op-date').value||todayStr(),
+    note:document.getElementById('wh-op-note').value
+  });
+  saveDB();closeModal('m-wh-op');renderWarehouse();
 }
 
 // ── Settings ──────────────────────────────────────────────────────────────
@@ -525,22 +850,24 @@ function renderSettings(){
   document.getElementById('st-w').textContent=DB.workers.length;
   document.getElementById('st-r').textContent=DB.records.length;
 }
+
 function saveDefPrices(){
   DB.defaultPrices={dadan:parseFloat(document.getElementById('dp-d').value)||DEF.dadan,ruta:parseFloat(document.getElementById('dp-r').value)||DEF.ruta,magazynna:parseFloat(document.getElementById('dp-m').value)||DEF.magazynna};
   saveDB();alert('✅ Базові ціни збережено');
 }
+
 function clearAll(){
-  if(confirm('Очистити всі записи? Виконавці залишаться.')){DB.records=[];saveDB();renderHome();renderSettings();}
+  if(confirm('Очистити всі записи? Виконавці та склад залишаться.')){{DB.records=[];saveDB();renderHome();renderSettings();}}
 }
 
 // ── Modals ────────────────────────────────────────────────────────────────
 function openModal(id){const el=document.getElementById(id);el.classList.add('open');setTimeout(()=>el.querySelector('.modal').style.transform='translateY(0)',10);}
 function closeModal(id){const m=document.getElementById(id);m.querySelector('.modal').style.transform='translateY(100%)';setTimeout(()=>m.classList.remove('open'),300);}
 function ovClick(e,el){if(e.target===el)closeModal(el.id);}
-function goTabByIdx(i){goTab(['home','workers','add','report','settings'][i],document.querySelectorAll('.tab')[i]);}
 
 // ── Worker modal ──────────────────────────────────────────────────────────
 function buildCpicker(cur){selColor=cur||COLORS[0];document.getElementById('cpicker').innerHTML=COLORS.map(c=>`<button style="background:${c};" class="${selColor===c?'on':''}" onclick="selColor='${c}';buildCpicker('${c}')"></button>`).join('');}
+
 function openAddWorker(editId){
   const w=editId?DB.workers.find(x=>x.id===editId):null;
   document.getElementById('mw-title').textContent=w?'Редагувати виконавця':'Новий виконавець';
@@ -551,6 +878,7 @@ function openAddWorker(editId){
   buildCpicker(w?.color||COLORS[0]);openModal('m-worker');
   setTimeout(()=>document.getElementById('wname').focus(),400);
 }
+
 function saveWorker(){
   const name=document.getElementById('wname').value.trim();if(!name){alert('Введіть ім\'я');return;}
   const id=document.getElementById('edit-wid').value;
@@ -567,16 +895,19 @@ function openModal_frames(){
   document.getElementById('f-note').value='';document.getElementById('f-date').value=todayStr();
   document.getElementById('f-total').style.display='none';onWorkerChange();openModal('m-frames');
 }
+
 function onWorkerChange(){
   const wid=document.getElementById('f-worker').value;const w=DB.workers.find(x=>x.id===wid);if(!w)return;
   const p=wp(w);document.getElementById('f-pd').value=p.d;document.getElementById('f-pr').value=p.r;document.getElementById('f-pm').value=p.m;calcTotal();
 }
+
 function calcTotal(){
   const d=+(document.getElementById('f-d').value)||0,r=+(document.getElementById('f-r').value)||0,m=+(document.getElementById('f-m').value)||0;
   const pd=+(document.getElementById('f-pd').value)||0,pr=+(document.getElementById('f-pr').value)||0,pm=+(document.getElementById('f-pm').value)||0;
   const total=d*pd+r*pr+m*pm;const box=document.getElementById('f-total');
   if(total>0){box.style.display='flex';document.getElementById('f-tv').textContent=fmt(total)+' ₴';}else box.style.display='none';
 }
+
 function saveFrames(){
   const wid=document.getElementById('f-worker').value;
   const d=+(document.getElementById('f-d').value)||0,r=+(document.getElementById('f-r').value)||0,m=+(document.getElementById('f-m').value)||0;
@@ -592,11 +923,13 @@ function addDItem(name='',qty=''){
   div.innerHTML=`<input class="fi" style="flex:2;background:var(--bg2);border-radius:9px;padding:10px 12px;" placeholder="Назва" value="${name}"><input class="fi" style="flex:1;background:var(--bg2);border-radius:9px;padding:10px 12px;" placeholder="К-сть" value="${qty}"><button onclick="this.parentElement.remove()" style="color:var(--red);font-size:22px;flex-shrink:0;padding:0 4px;">×</button>`;
   c.appendChild(div);
 }
+
 function openModal_delivery(){
   document.getElementById('edit-did').value='';document.getElementById('md-title').textContent='📦 Завезення';
   document.getElementById('d-worker').innerHTML=DB.workers.map(w=>`<option value="${w.id}">${w.name}</option>`).join('');
   document.getElementById('d-date').value=todayStr();document.getElementById('d-note').value='';document.getElementById('d-items').innerHTML='';addDItem();openModal('m-delivery');
 }
+
 function openEditDelivery(recId){
   const r=DB.records.find(x=>x.id===recId);if(!r)return;closeModal('m-ddetail');
   setTimeout(()=>{
@@ -606,6 +939,7 @@ function openEditDelivery(recId){
     document.getElementById('d-items').innerHTML='';(r.items||[]).forEach(i=>addDItem(i.name,i.qty||''));openModal('m-delivery');
   },350);
 }
+
 function saveDelivery(){
   const wid=document.getElementById('d-worker').value;const rows=document.getElementById('d-items').children;
   const items=[];for(const row of rows){const inputs=row.querySelectorAll('input');const name=inputs[0].value.trim();if(name)items.push({name,qty:inputs[1].value.trim()});}
@@ -613,7 +947,7 @@ function saveDelivery(){
   const editId=document.getElementById('edit-did').value;
   const rec={id:editId||gid(),date:document.getElementById('d-date').value||todayStr(),type:'delivery',workerId:wid,items,note:document.getElementById('d-note').value};
   if(editId)DB.records=DB.records.map(r=>r.id===editId?rec:r);else DB.records.push(rec);
-  saveDB();closeModal('m-delivery');renderHome();renderReport();
+  saveDB();closeModal('m-delivery');renderHome();
 }
 
 // ── Payment modal ─────────────────────────────────────────────────────────
@@ -621,6 +955,7 @@ function openModal_payment(){
   document.getElementById('p-worker').innerHTML=DB.workers.map(w=>`<option value="${w.id}">${w.name}</option>`).join('');
   document.getElementById('p-amount').value='';document.getElementById('p-reason').value='';document.getElementById('p-date').value=todayStr();updateDebt();openModal('m-payment');
 }
+
 function updateDebt(){
   const wid=document.getElementById('p-worker').value;const recs=DB.records.filter(r=>r.workerId===wid);
   const earned=recs.filter(r=>r.type==='frames').reduce((s,r)=>s+recEarned(r),0);
@@ -629,8 +964,9 @@ function updateDebt(){
   if(earned>0||paid>0){
     box.style.display='flex';box.style.background=debt>0?'var(--red-l)':debt<0?'var(--green-l)':'var(--bg3)';
     box.innerHTML=`<div><div style="font-size:12px;color:var(--text2);margin-bottom:2px;">Нарах.: ${fmt(earned)} ₴ · Випл.: ${fmt(paid)} ₴</div><div style="font-weight:700;color:${debt>0?'var(--red)':debt<0?'var(--green)':'var(--text2)'};">${debt>0?'Борг: '+fmt(debt)+' ₴':debt<0?'Переплата: '+fmt(Math.abs(debt))+' ₴':'Рівно ✓'}</div></div>${debt>0?`<button class="badge br" onclick="document.getElementById('p-amount').value='${debt}'">Весь борг</button>`:''}`;
-  } else box.style.display='none';
+  }else box.style.display='none';
 }
+
 function savePayment(){
   const wid=document.getElementById('p-worker').value;const amount=parseFloat(document.getElementById('p-amount').value);
   if(!amount){alert('Введіть суму');return;}
@@ -647,10 +983,11 @@ function openDDetail(recId){
       <button onclick="openEditDelivery('${r.id}')" style="color:var(--accent);padding:8px;">${IC.edit}</button>
     </div>
     <div style="padding:14px 16px 6px;">${(r.items||[]).map(i=>`<div class="deliv-item"><span>${i.name}</span><span>${i.qty?'× '+i.qty:''}</span></div>`).join('')}${r.note?`<div style="margin-top:10px;font-size:14px;color:var(--text2);">💬 ${r.note}</div>`:''}</div>
-    <div class="btn-row"><button class="btn bs" onclick="closeModal('m-ddetail')">Закрити</button><button class="btn bd" onclick="delDelivery('${r.id}')">Видалити</button></div>`;
+    <div class="btn-row"><button class="btn bps" onclick="closeModal('m-ddetail')">Закрити</button><button class="btn bpd" onclick="delDelivery('${r.id}')">Видалити</button></div>`;
   openModal('m-ddetail');
 }
-function delDelivery(id){if(!confirm('Видалити це завезення?'))return;DB.records=DB.records.filter(r=>r.id!==id);saveDB();closeModal('m-ddetail');renderHome();renderReport();}
+
+function delDelivery(id){if(!confirm('Видалити це завезення?'))return;DB.records=DB.records.filter(r=>r.id!==id);saveDB();closeModal('m-ddetail');renderHome();}
 
 // ── Worker detail ─────────────────────────────────────────────────────────
 function openWDetail(id){
@@ -672,9 +1009,10 @@ function openWDetail(id){
     </div>
     <div style="padding:0 20px 6px;font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;">Записи (${recs.length})</div>
     <div class="card" style="max-height:340px;overflow-y:auto;margin-bottom:4px;">${recs.length?recs.map(r=>wdetailRow(r,w.id)).join(''):`<div class="empty" style="padding:14px;">Немає записів</div>`}</div>
-    <div class="btn-row"><button class="btn bs" onclick="closeModal('m-wdetail')">Закрити</button><button class="btn bd" onclick="delWorker('${w.id}')">Видалити</button></div>`;
+    <div class="btn-row"><button class="btn bps" onclick="closeModal('m-wdetail')">Закрити</button><button class="btn bpd" onclick="delWorker('${w.id}')">Видалити</button></div>`;
   openModal('m-wdetail');
 }
+
 function wdetailRow(r,wid){
   const{ic,bg}=recIcon(r.type);const isD=r.type==='delivery';
   return`<div class="rrow"><div class="rrow-body" ${isD?`onclick="closeModal('m-wdetail');setTimeout(()=>openDDetail('${r.id}'),350);"`:''}>
@@ -683,6 +1021,7 @@ function wdetailRow(r,wid){
     ${recAmt(r)}${isD?`<div style="color:var(--accent);margin-left:2px;">${IC.chev}</div>`:''}
   </div><button class="rrow-del" onclick="delRecInDetail('${r.id}','${wid}')">${IC.trash}</button></div>`;
 }
+
 function rrowHtml(r,showWorker=false){
   const{ic,bg}=recIcon(r.type);const w=DB.workers.find(x=>x.id===r.workerId);
   const sub=showWorker&&w?w.name:(r.note||r.reason||'');const isD=r.type==='delivery';
@@ -692,18 +1031,20 @@ function rrowHtml(r,showWorker=false){
     ${recAmt(r)}${isD?`<div style="color:var(--accent);margin-left:2px;">${IC.chev}</div>`:''}
   </div></div>`;
 }
+
 function delRecInDetail(recId,wid){if(!confirm('Видалити цей запис?'))return;DB.records=DB.records.filter(r=>r.id!==recId);saveDB();openWDetail(wid);renderHome();}
 function delWorker(id){const w=DB.workers.find(x=>x.id===id);if(!w||!confirm(`Видалити ${w.name}? Записи залишаться.`))return;DB.workers=DB.workers.filter(x=>x.id!==id);saveDB();closeModal('m-wdetail');renderHome();renderWorkers();}
 
 // ── Init ──────────────────────────────────────────────────────────────────
 (async function init(){
-  DB = loadDB() || {"defaultPrices":{"dadan":4.5,"ruta":3.5,"magazynna":3.0},"workers":[],"records":[]};
+  const local=loadLocalDB();
+  DB=local||{defaultPrices:{dadan:4.5,ruta:3.5,magazynna:3.0},workers:[],records:[],warehouse:{items:[],operations:[]}};
+  if(!DB.warehouse)DB.warehouse={items:[],operations:[]};
   document.getElementById('lov').style.display='none';
   document.getElementById('app').style.display='flex';
   renderHome();
-  // Підтягуємо актуальні дані з сервера
-  const loaded = await loadFromAPI();
-  if(loaded){ renderHome(); renderSettings(); }
+  const loaded=await loadFromAPI();
+  if(loaded){renderHome();renderSettings();}
 })();
 </script>
 </body>
