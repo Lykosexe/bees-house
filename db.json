@@ -1,38 +1,691 @@
 {
-  "defaultPrices": { "dadan": 4.5, "ruta": 3.5, "magazynna": 3 },
+  "defaultPrices": {
+    "dadan": 4.5,
+    "ruta": 3.5,
+    "magazynna": 3
+  },
   "workers": [
-    {"id":"w1","name":"Саша Кременець","color":"#ff9500","prices":{"dadan":4.5,"ruta":3.8,"magazynna":3}},
-    {"id":"w2","name":"Настя Комарівка","color":"#007aff","prices":{"dadan":4,"ruta":3.8,"magazynna":3}},
-    {"id":"w3","name":"Наташа Берег","color":"#34c759","prices":{"dadan":4.5,"ruta":3.5,"magazynna":3}},
-    {"id":"vex53xvaqqmos8cy59","name":"Микола Почаїв","color":"#ff3b30","prices":{"dadan":4.5,"ruta":3.5,"magazynna":3}}
+    {
+      "id": "w1",
+      "name": "Саша Кременець",
+      "color": "#ff9500",
+      "prices": {
+        "dadan": 4.5,
+        "ruta": 3.8,
+        "magazynna": 3
+      }
+    },
+    {
+      "id": "w2",
+      "name": "Настя Комарівка",
+      "color": "#007aff",
+      "prices": {
+        "dadan": 4,
+        "ruta": 3.8,
+        "magazynna": 3
+      }
+    },
+    {
+      "id": "w3",
+      "name": "Наташа Берег",
+      "color": "#34c759",
+      "prices": {
+        "dadan": 4.5,
+        "ruta": 3.5,
+        "magazynna": 3
+      }
+    },
+    {
+      "id": "vex53xvaqqmos8cy59",
+      "name": "Микола Почаїв",
+      "color": "#ff3b30",
+      "prices": {
+        "dadan": 4.5,
+        "ruta": 3.5,
+        "magazynna": 3
+      }
+    },
+    {
+      "id": "8al051qcozmmp57k7zr",
+      "name": "Марина Плоска",
+      "color": "#af52de",
+      "prices": {
+        "dadan": 4.5,
+        "ruta": 3.5,
+        "magazynna": 3
+      }
+    }
   ],
   "records": [
-    {"id":"r1","date":"2026-04-25","type":"frames","workerId":"w2","dadan":440,"ruta":0,"magazynna":0,"pDadan":4,"pRuta":3.8,"pMag":3,"note":""},
-    {"id":"r2","date":"2026-04-25","type":"payment","workerId":"w2","amount":1020,"reason":""},
-    {"id":"r3","date":"2026-04-25","type":"frames","workerId":"w3","dadan":670,"ruta":0,"magazynna":0,"pDadan":4.5,"pRuta":3.8,"pMag":3,"note":""},
-    {"id":"r4","date":"2026-04-25","type":"payment","workerId":"w3","amount":3015,"reason":""},
-    {"id":"r5","date":"2026-04-25","type":"delivery","workerId":"w3","items":[{"name":"Верх 300×400","qty":""},{"name":"Верх 145×500","qty":""},{"name":"Скоби","qty":"1"}],"note":""},
-    {"id":"r6","date":"2026-04-25","type":"delivery","workerId":"w1","items":[{"name":"Дріт","qty":"1"}],"note":""},
-    {"id":"r7","date":"2026-04-25","type":"frames","workerId":"w1","dadan":0,"ruta":0,"magazynna":100,"pDadan":4.5,"pRuta":3.8,"pMag":3,"note":""},
-    {"id":"r8","date":"2026-04-25","type":"delivery","workerId":"w2","items":[{"name":"Верх 300×400","qty":""},{"name":"Скоби","qty":"1"}],"note":""},
-    {"id":"r9","date":"2026-04-27","type":"delivery","workerId":"w1","items":[{"name":"Низ","qty":"2"},{"name":"Верх 300×300","qty":""},{"name":"Верх 145×500","qty":""}],"note":""},
-    {"id":"r10","date":"2026-04-27","type":"delivery","workerId":"w1","items":[{"name":"Дріт","qty":"1"}],"note":""},
-    {"id":"r11","date":"2026-04-27","type":"payment","workerId":"w1","amount":300,"reason":""},
-    {"id":"r12","date":"2026-04-29","type":"payment","workerId":"w2","amount":700,"reason":""},
-    {"id":"r13","date":"2026-05-01","type":"delivery","workerId":"w2","items":[{"name":"Верх 300","qty":"400"},{"name":"Скоби","qty":"1"},{"name":"Втулки","qty":"1"},{"name":"Низи","qty":"2"}],"note":"Низи у мішках"},
-    {"id":"r14","date":"2026-05-02","type":"delivery","workerId":"w3","items":[{"name":"Верхи","qty":"500"},{"name":"Низи","qty":"2"},{"name":"Бочини 300","qty":"4"},{"name":"Втулки","qty":"1"},{"name":"Скоби","qty":"1"}],"note":"Бочини і низи у мішках"},
-    {"id":"a6i8b3ftxk6moo651kb","date":"2026-05-02","type":"frames","workerId":"w3","dadan":500,"ruta":500,"magazynna":0,"pDadan":4.5,"pRuta":3.5,"pMag":3,"note":""},
-    {"id":"919t6kc59frmoo6ut0b","date":"2026-05-01","type":"frames","workerId":"w1","dadan":200,"ruta":0,"magazynna":0,"pDadan":4,"pRuta":3.8,"pMag":3,"note":""},
-    {"id":"gdbazt7vyo7moo6wd5b","date":"2026-05-01","type":"delivery","workerId":"w1","items":[{"name":"Втулки","qty":"1"},{"name":"Скоби","qty":"1"},{"name":"Заготовки 145","qty":"500"}],"note":""},
-    {"id":"kbp5o59rbsmoo6woto","date":"2026-05-01","type":"payment","workerId":"w1","amount":800,"reason":""},
-    {"id":"rjmeg6dvavmooadyl9","date":"2026-05-02","type":"payment","workerId":"w3","amount":4000,"reason":""},
-    {"id":"egttrvm9tsmoobhabt","date":"2026-05-02","type":"delivery","workerId":"w2","items":[{"name":"Верхи 300","qty":"5"},{"name":"Бочини 300","qty":"3"},{"name":"Низи","qty":"2"},{"name":"Дріт","qty":"1"}],"note":"Низи і бочини у мішках"},
-    {"id":"fky3wih3e7bmoobiuzv","date":"2026-05-02","type":"frames","workerId":"w2","dadan":850,"ruta":0,"magazynna":0,"pDadan":4,"pRuta":3.8,"pMag":3,"note":""},
-    {"id":"kryit26ajxmoobjplj","date":"2026-05-02","type":"payment","workerId":"w2","amount":3500,"reason":""},
-    {"id":"6r788i30t3nmos99mk6","date":"2026-05-05","type":"delivery","workerId":"vex53xvaqqmos8cy59","items":[{"name":"Скоби","qty":"1"}],"note":""},
-    {"id":"az45eq5a0pqmos99tsn","date":"2026-05-05","type":"payment","workerId":"vex53xvaqqmos8cy59","amount":1000,"reason":""},
-    {"id":"2yse1jdow2hmoud6vh7","date":"2026-05-06","type":"frames","workerId":"w1","dadan":100,"ruta":0,"magazynna":300,"pDadan":4,"pRuta":3.8,"pMag":3,"note":""},
-    {"id":"fn3jcxb1gmqmoud6zfb","date":"2026-05-06","type":"payment","workerId":"w1","amount":1300,"reason":""},
-    {"id":"s35l1t9zejmoud7ae8","date":"2026-05-06","type":"delivery","workerId":"w1","items":[{"name":"Дріт","qty":"1"}],"note":""}
-  ]
+    {
+      "id": "r1",
+      "date": "2026-04-25",
+      "type": "frames",
+      "workerId": "w2",
+      "dadan": 440,
+      "ruta": 0,
+      "magazynna": 0,
+      "pDadan": 4,
+      "pRuta": 3.8,
+      "pMag": 3,
+      "note": ""
+    },
+    {
+      "id": "r2",
+      "date": "2026-04-25",
+      "type": "payment",
+      "workerId": "w2",
+      "amount": 1020,
+      "reason": ""
+    },
+    {
+      "id": "r3",
+      "date": "2026-04-25",
+      "type": "frames",
+      "workerId": "w3",
+      "dadan": 670,
+      "ruta": 0,
+      "magazynna": 0,
+      "pDadan": 4.5,
+      "pRuta": 3.8,
+      "pMag": 3,
+      "note": ""
+    },
+    {
+      "id": "r4",
+      "date": "2026-04-25",
+      "type": "payment",
+      "workerId": "w3",
+      "amount": 3015,
+      "reason": ""
+    },
+    {
+      "id": "r5",
+      "date": "2026-04-25",
+      "type": "delivery",
+      "workerId": "w3",
+      "items": [
+        {
+          "name": "Верх 300×400",
+          "qty": ""
+        },
+        {
+          "name": "Верх 145×500",
+          "qty": ""
+        },
+        {
+          "name": "Скоби",
+          "qty": "1"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "id": "r6",
+      "date": "2026-04-25",
+      "type": "delivery",
+      "workerId": "w1",
+      "items": [
+        {
+          "name": "Дріт",
+          "qty": "1"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "id": "r7",
+      "date": "2026-04-25",
+      "type": "frames",
+      "workerId": "w1",
+      "dadan": 0,
+      "ruta": 0,
+      "magazynna": 100,
+      "pDadan": 4.5,
+      "pRuta": 3.8,
+      "pMag": 3,
+      "note": ""
+    },
+    {
+      "id": "r8",
+      "date": "2026-04-25",
+      "type": "delivery",
+      "workerId": "w2",
+      "items": [
+        {
+          "name": "Верх 300×400",
+          "qty": ""
+        },
+        {
+          "name": "Скоби",
+          "qty": "1"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "id": "r9",
+      "date": "2026-04-27",
+      "type": "delivery",
+      "workerId": "w1",
+      "items": [
+        {
+          "name": "Низ",
+          "qty": "2"
+        },
+        {
+          "name": "Верх 300×300",
+          "qty": ""
+        },
+        {
+          "name": "Верх 145×500",
+          "qty": ""
+        }
+      ],
+      "note": ""
+    },
+    {
+      "id": "r10",
+      "date": "2026-04-27",
+      "type": "delivery",
+      "workerId": "w1",
+      "items": [
+        {
+          "name": "Дріт",
+          "qty": "1"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "id": "r11",
+      "date": "2026-04-27",
+      "type": "payment",
+      "workerId": "w1",
+      "amount": 300,
+      "reason": ""
+    },
+    {
+      "id": "r12",
+      "date": "2026-04-29",
+      "type": "payment",
+      "workerId": "w2",
+      "amount": 700,
+      "reason": ""
+    },
+    {
+      "id": "r13",
+      "date": "2026-05-01",
+      "type": "delivery",
+      "workerId": "w2",
+      "items": [
+        {
+          "name": "Верх 300",
+          "qty": "400"
+        },
+        {
+          "name": "Скоби",
+          "qty": "1"
+        },
+        {
+          "name": "Втулки",
+          "qty": "1"
+        },
+        {
+          "name": "Низи",
+          "qty": "2"
+        }
+      ],
+      "note": "Низи у мішках"
+    },
+    {
+      "id": "r14",
+      "date": "2026-05-02",
+      "type": "delivery",
+      "workerId": "w3",
+      "items": [
+        {
+          "name": "Верхи",
+          "qty": "500"
+        },
+        {
+          "name": "Низи",
+          "qty": "2"
+        },
+        {
+          "name": "Бочини 300",
+          "qty": "4"
+        },
+        {
+          "name": "Втулки",
+          "qty": "1"
+        },
+        {
+          "name": "Скоби",
+          "qty": "1"
+        }
+      ],
+      "note": "Бочини і низи у мішках"
+    },
+    {
+      "id": "a6i8b3ftxk6moo651kb",
+      "date": "2026-05-02",
+      "type": "frames",
+      "workerId": "w3",
+      "dadan": 500,
+      "ruta": 500,
+      "magazynna": 0,
+      "pDadan": 4.5,
+      "pRuta": 3.5,
+      "pMag": 3,
+      "note": ""
+    },
+    {
+      "id": "919t6kc59frmoo6ut0b",
+      "date": "2026-05-01",
+      "type": "frames",
+      "workerId": "w1",
+      "dadan": 200,
+      "ruta": 0,
+      "magazynna": 0,
+      "pDadan": 4,
+      "pRuta": 3.8,
+      "pMag": 3,
+      "note": ""
+    },
+    {
+      "id": "gdbazt7vyo7moo6wd5b",
+      "date": "2026-05-01",
+      "type": "delivery",
+      "workerId": "w1",
+      "items": [
+        {
+          "name": "Втулки",
+          "qty": "1"
+        },
+        {
+          "name": "Скоби",
+          "qty": "1"
+        },
+        {
+          "name": "Заготовки 145",
+          "qty": "500"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "id": "kbp5o59rbsmoo6woto",
+      "date": "2026-05-01",
+      "type": "payment",
+      "workerId": "w1",
+      "amount": 800,
+      "reason": ""
+    },
+    {
+      "id": "rjmeg6dvavmooadyl9",
+      "date": "2026-05-02",
+      "type": "payment",
+      "workerId": "w3",
+      "amount": 4000,
+      "reason": ""
+    },
+    {
+      "id": "egttrvm9tsmoobhabt",
+      "date": "2026-05-02",
+      "type": "delivery",
+      "workerId": "w2",
+      "items": [
+        {
+          "name": "Верхи 300",
+          "qty": "5"
+        },
+        {
+          "name": "Бочини 300",
+          "qty": "3"
+        },
+        {
+          "name": "Низи",
+          "qty": "2"
+        },
+        {
+          "name": "Дріт",
+          "qty": "1"
+        }
+      ],
+      "note": "Низи і бочини у мішках"
+    },
+    {
+      "id": "fky3wih3e7bmoobiuzv",
+      "date": "2026-05-02",
+      "type": "frames",
+      "workerId": "w2",
+      "dadan": 850,
+      "ruta": 0,
+      "magazynna": 0,
+      "pDadan": 4,
+      "pRuta": 3.8,
+      "pMag": 3,
+      "note": ""
+    },
+    {
+      "id": "kryit26ajxmoobjplj",
+      "date": "2026-05-02",
+      "type": "payment",
+      "workerId": "w2",
+      "amount": 3500,
+      "reason": ""
+    },
+    {
+      "id": "6r788i30t3nmos99mk6",
+      "date": "2026-05-05",
+      "type": "delivery",
+      "workerId": "vex53xvaqqmos8cy59",
+      "items": [
+        {
+          "name": "Скоби",
+          "qty": "1"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "id": "az45eq5a0pqmos99tsn",
+      "date": "2026-05-05",
+      "type": "payment",
+      "workerId": "vex53xvaqqmos8cy59",
+      "amount": 1000,
+      "reason": ""
+    },
+    {
+      "id": "2yse1jdow2hmoud6vh7",
+      "date": "2026-05-06",
+      "type": "frames",
+      "workerId": "w1",
+      "dadan": 100,
+      "ruta": 0,
+      "magazynna": 300,
+      "pDadan": 4,
+      "pRuta": 3.8,
+      "pMag": 3,
+      "note": ""
+    },
+    {
+      "id": "fn3jcxb1gmqmoud6zfb",
+      "date": "2026-05-06",
+      "type": "payment",
+      "workerId": "w1",
+      "amount": 1300,
+      "reason": ""
+    },
+    {
+      "id": "s35l1t9zejmoud7ae8",
+      "date": "2026-05-06",
+      "type": "delivery",
+      "workerId": "w1",
+      "items": [
+        {
+          "name": "Дріт",
+          "qty": "1"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "id": "n1quuhx060amoy7k5ug",
+      "date": "2026-05-09",
+      "type": "delivery",
+      "workerId": "w3",
+      "items": [
+        {
+          "name": "Низи",
+          "qty": "700"
+        },
+        {
+          "name": "Верхи 145",
+          "qty": "650"
+        },
+        {
+          "name": "Скоби",
+          "qty": "1"
+        },
+        {
+          "name": "Втулки",
+          "qty": "1"
+        },
+        {
+          "name": "Дріт",
+          "qty": "1"
+        },
+        {
+          "name": "Бочини 230",
+          "qty": "5,5"
+        }
+      ],
+      "note": "Бочини у мішках"
+    },
+    {
+      "id": "kiv8yqvvaxomoy7kwtv",
+      "date": "2026-05-09",
+      "type": "frames",
+      "workerId": "w3",
+      "dadan": 500,
+      "ruta": 0,
+      "magazynna": 0,
+      "pDadan": 4.5,
+      "pRuta": 3.5,
+      "pMag": 3,
+      "note": ""
+    },
+    {
+      "id": "pk423nvw0jqmoyejo72",
+      "date": "2026-05-09",
+      "type": "frames",
+      "workerId": "w2",
+      "dadan": 520,
+      "ruta": 0,
+      "magazynna": 0,
+      "pDadan": 4,
+      "pRuta": 3.8,
+      "pMag": 3,
+      "note": ""
+    },
+    {
+      "id": "axf9wagt6fumoyejxza",
+      "date": "2026-05-09",
+      "type": "payment",
+      "workerId": "w2",
+      "amount": 2000,
+      "reason": ""
+    },
+    {
+      "id": "v0drv8sow3moyek9k2",
+      "date": "2026-05-09",
+      "type": "payment",
+      "workerId": "w3",
+      "amount": 2200,
+      "reason": ""
+    },
+    {
+      "id": "4d7e7lineg5moyetvbw",
+      "date": "2026-05-09",
+      "type": "delivery",
+      "workerId": "w2",
+      "items": [
+        {
+          "name": "Верх 300",
+          "qty": "1000"
+        },
+        {
+          "name": "Низ",
+          "qty": "1000"
+        },
+        {
+          "name": "Бочина 300",
+          "qty": "4,5"
+        }
+      ],
+      "note": "Бочини у мішках"
+    },
+    {
+      "id": "l2dxtbvu1efmp4ztw7n",
+      "date": "2026-05-13",
+      "type": "payment",
+      "workerId": "vex53xvaqqmos8cy59",
+      "amount": 1150,
+      "reason": ""
+    },
+    {
+      "id": "8s4j1boslhemp56fjqh",
+      "date": "2026-05-14",
+      "type": "delivery",
+      "workerId": "w1",
+      "items": [
+        {
+          "name": "Дріт",
+          "qty": "1"
+        },
+        {
+          "name": "Цвяхи",
+          "qty": "1"
+        },
+        {
+          "name": "Верх 145",
+          "qty": "300"
+        },
+        {
+          "name": "Низ",
+          "qty": "300"
+        },
+        {
+          "name": "Бочини 145",
+          "qty": "1"
+        }
+      ],
+      "note": "Бочини у мішку"
+    },
+    {
+      "id": "5zoxjuxiw2fmp57owdi",
+      "date": "2026-05-14",
+      "type": "delivery",
+      "workerId": "8al051qcozmmp57k7zr",
+      "items": [
+        {
+          "name": "Верх 145",
+          "qty": "2000"
+        },
+        {
+          "name": "Низ",
+          "qty": "2000"
+        },
+        {
+          "name": "Бочина 145",
+          "qty": "6"
+        },
+        {
+          "name": "Дріт",
+          "qty": "2"
+        },
+        {
+          "name": "Скоби",
+          "qty": "2"
+        },
+        {
+          "name": "Втулки",
+          "qty": "1"
+        },
+        {
+          "name": "Цвяхи",
+          "qty": "1"
+        }
+      ],
+      "note": "Бочини у мішках "
+    },
+    {
+      "id": "jwzvu1l9efmp6lfekr",
+      "date": "2026-05-15",
+      "type": "delivery",
+      "workerId": "w2",
+      "items": [
+        {
+          "name": "Верх 300",
+          "qty": "500"
+        },
+        {
+          "name": "Низ",
+          "qty": "500"
+        },
+        {
+          "name": "Бочини 300",
+          "qty": "3"
+        },
+        {
+          "name": "Скоби",
+          "qty": "1"
+        },
+        {
+          "name": "Цвяхи",
+          "qty": "1"
+        }
+      ],
+      "note": "Бочини у мішках"
+    },
+    {
+      "id": "s2xjldmnjd9mp6mi3tg",
+      "date": "2026-05-15",
+      "type": "delivery",
+      "workerId": "w3",
+      "items": [
+        {
+          "name": "Верх 145",
+          "qty": "500"
+        },
+        {
+          "name": "Низ",
+          "qty": "300"
+        },
+        {
+          "name": "Дріт",
+          "qty": "1"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "id": "5eyn1age8rcmp858bqi",
+      "date": "2026-05-16",
+      "type": "frames",
+      "workerId": "vex53xvaqqmos8cy59",
+      "dadan": 200,
+      "ruta": 0,
+      "magazynna": 0,
+      "pDadan": 4.5,
+      "pRuta": 3.5,
+      "pMag": 3,
+      "note": ""
+    },
+    {
+      "id": "d9jcqxjmdhbmp86mnhg",
+      "date": "2026-05-16",
+      "type": "frames",
+      "workerId": "vex53xvaqqmos8cy59",
+      "dadan": 100,
+      "ruta": 0,
+      "magazynna": 0,
+      "pDadan": 4.5,
+      "pRuta": 3.5,
+      "pMag": 3,
+      "note": ""
+    }
+  ],
+  "warehouse": {
+    "items": [
+      {
+        "id": "wg77bwc6q9rmp8kar4p",
+        "name": "Бочина 230",
+        "unit": "шт"
+      }
+    ],
+    "operations": []
+  }
 }
